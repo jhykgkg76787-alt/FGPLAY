@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FG PLAY • Superman 1941</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  background:#0f0f0f;
+  color:#fff;
+}
+
+/* HEADER */
+header{
+  position:fixed;
+  width:100%;
+  padding:15px 5%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(0,0,0,0.9);
+  z-index:1000;
+}
+
+.logo{
+  font-size:1.4rem;
+  font-weight:800;
+  color:#00b3ff;
+}
+
+/* HERO */
+.hero{
+  height:100vh;
+  background:
+  linear-gradient(to top,#0f0f0f 10%,transparent 60%),
+  url('https://github.com/user-attachments/assets/c176da8e-d1b9-4c14-973d-460abf2b08d0') center/cover no-repeat;
+  display:flex;
+  align-items:center;
+  padding:0 5%;
+}
+
+.hero-content{
+  max-width:600px;
+}
+
+.hero h1{
+  font-size:3rem;
+  margin-bottom:20px;
+}
+
+.hero p{
+  margin-bottom:20px;
+  color:#ddd;
+}
+
+.btn{
+  padding:12px 25px;
+  border-radius:5px;
+  background:#00b3ff;
+  color:#000;
+  text-decoration:none;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* PLAYER */
+.player-section{
+  display:none;
+  padding:120px 5% 60px 5%;
+}
+
+video{
+  width:100%;
+  max-width:900px;
+  border-radius:10px;
+  margin-bottom:30px;
+}
+
+/* EPISÓDIOS */
+.episodes{
+  padding:60px 5%;
+}
+
+.episodes h2{
+  margin-bottom:20px;
+}
+
+/* NOVO CSS QUE VOCÊ PEDIU */
+.episode-list{
+  list-style:none;
+  padding:0;
+}
+
+.episode-list li{
+  margin-bottom:10px;
+}
+
+.episode-list a{
+  display:block;
+  padding:12px;
+  background:#1a1a1a;
+  border-radius:5px;
+  text-decoration:none;
+  color:#fff;
+  transition:0.3s;
+}
+
+.episode-list a:hover{
+  background:#00b3ff;
+  color:#000;
+}
+
+footer{
+  text-align:center;
+  padding:30px;
+  color:#777;
+  border-top:1px solid #222;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">FG PLAY</div>
+</header>
+
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <h1>SUPERMAN (1941)</h1>
+    <p>
+      A clássica animação apresenta o herói protegendo Metrópolis contra ameaças incríveis.
+    </p>
+
+    <button class="btn" onclick="mostrarPlayer()">
+      <i class="fas fa-play"></i> Assistir
+    </button>
+  </div>
+</section>
+
+
+
+<section class="episodes">
+  <h2>Temporada 1</h2>
+
+  <ul class="episode-list">
+    <li>
+      <a href="SUPERMEN 1941 PLAY.html">Episódio 01 - o Cientista Louco</a>
+    </li>
+
+</section>
+
+<footer>
+  © 2026 FG PLAY
+</footer>
+
+<script>
+function mostrarPlayer(){
+  document.getElementById("hero").style.display="none";
+  document.getElementById("playerSection").style.display="block";
+}
+</script>
+
+</body>
+</html>
