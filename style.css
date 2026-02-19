@@ -1,0 +1,250 @@
+/* =========================
+   VARIÁVEIS
+========================= */
+:root{
+    --bg-1:#040b18;
+    --bg-2:#07152e;
+    --bg-3:#0a1f44;
+    --primary:#1f80ff;
+    --primary-hover:#3a9bff;
+    --text-light:#d0d8ff;
+    --card-bg:#081830;
+}
+
+/* =========================
+   RESET
+========================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', Arial, sans-serif;
+}
+
+body{
+    background: radial-gradient(circle at top, var(--bg-3) 0%, var(--bg-2) 40%, var(--bg-1) 100%);
+    color:white;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+/* =========================
+   HEADER
+========================= */
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 60px;
+    position:relative;
+    z-index:10;
+}
+
+.logo img{
+    height:55px;
+}
+
+nav a{
+    color:var(--text-light);
+    margin-left:30px;
+    text-decoration:none;
+    font-size:14px;
+    letter-spacing:0.5px;
+    transition:0.3s ease;
+    position:relative;
+}
+
+nav a::after{
+    content:"";
+    position:absolute;
+    width:0%;
+    height:2px;
+    left:0;
+    bottom:-5px;
+    background:var(--primary);
+    transition:0.3s;
+}
+
+nav a:hover{
+    color:white;
+}
+
+nav a:hover::after{
+    width:100%;
+}
+
+/* =========================
+   HERO
+========================= */
+.hero{
+    height:75vh;
+    display:flex;
+    align-items:center;
+    padding:0 80px;
+    background:
+    linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
+    url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba')
+    center/cover no-repeat;
+}
+
+.hero-content{
+    max-width:600px;
+}
+
+.hero h1{
+    font-size:52px;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+.hero p{
+    color:var(--text-light);
+    margin-bottom:30px;
+    line-height:1.6;
+}
+
+.hero button{
+    padding:12px 28px;
+    border:none;
+    background:var(--primary);
+    color:white;
+    font-size:15px;
+    border-radius:30px;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 0 15px rgba(31,128,255,0.4);
+}
+
+.hero button:hover{
+    background:var(--primary-hover);
+    transform:scale(1.05);
+    box-shadow:0 0 20px rgba(31,128,255,0.7);
+}
+
+/* =========================
+   SEÇÃO
+========================= */
+.section{
+    padding:60px 80px;
+}
+
+.section h2{
+    margin-bottom:30px;
+    font-size:22px;
+}
+
+/* =========================
+   GRID DE FILMES
+========================= */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(190px,1fr));
+    gap:20px;
+}
+
+.card{
+    border-radius:12px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:0.3s;
+    background:var(--card-bg);
+}
+
+.card img{
+    width:100%;
+    display:block;
+    transition:0.4s ease;
+}
+
+.card:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 25px rgba(31,128,255,0.3);
+}
+
+.card:hover img{
+    filter:brightness(1.15);
+}
+
+.card-info{
+    padding:12px;
+    font-size:14px;
+}
+
+/* =========================
+   POSTER DESTAQUE
+========================= */
+.poster{
+    margin:80px auto;
+    max-width:320px;
+    text-align:center;
+}
+
+.poster img{
+    width:100%;
+    border-radius:15px;
+    box-shadow:0 0 25px rgba(0,0,0,0.6);
+}
+
+.poster h3{
+    margin-top:15px;
+}
+
+.btn-assistir{
+    display:inline-block;
+    padding:10px 22px;
+    background:var(--primary);
+    border-radius:25px;
+    text-decoration:none;
+    color:white;
+    font-size:14px;
+    margin-top:10px;
+    transition:0.3s;
+}
+
+.btn-assistir:hover{
+    background:var(--primary-hover);
+    transform:scale(1.05);
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer{
+    text-align:center;
+    padding:30px;
+    font-size:14px;
+    color:#9bb2ff;
+    background:rgba(0,0,0,0.3);
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+@media(max-width:768px){
+
+    header{
+        padding:20px;
+    }
+
+    nav a{
+        margin-left:15px;
+        font-size:13px;
+    }
+
+    .hero{
+        padding:40px;
+        height:60vh;
+    }
+
+    .hero h1{
+        font-size:32px;
+    }
+
+    .section{
+        padding:40px 20px;
+    }
+
+    .grid{
+        grid-template-columns:repeat(auto-fill, minmax(150px,1fr));
+    }
+}
