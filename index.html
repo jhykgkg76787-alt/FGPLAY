@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FG PLAY • Superman 1941</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>FG PLAY</title>
 
 <style>
 
@@ -17,92 +15,57 @@
 }
 
 body{
-  font-family: Arial, Helvetica, sans-serif;
-  background:#0f0f0f;
-  color:#fff;
+  background:#000;
+  font-family:Arial, Helvetica, sans-serif;
+  overflow:hidden;
 }
 
-/* HEADER */
-header{
+/* INTRO */
+.intro{
   position:fixed;
   width:100%;
-  padding:15px 5%;
+  height:100vh;
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
   align-items:center;
-  background:rgba(0,0,0,0.9);
-  z-index:1000;
+  background:#000;
+  animation:fadeOut 1s ease 3s forwards;
 }
 
 .logo{
-  font-size:1.4rem;
-  font-weight:800;
-  color:#00b3ff;
-}
-
-/* HERO */
-.hero{
-  height:100vh;
-  background:
-  linear-gradient(to top,#0f0f0f 10%,transparent 60%),
-  url('https://github.com/user-attachments/assets/c176da8e-d1b9-4c14-973d-460abf2b08d0') center/cover no-repeat;
-  display:flex;
-  align-items:center;
-  padding:0 5%;
-}
-
-.hero-content{
-  max-width:600px;
-}
-
-.hero h1{
-  font-size:3.5rem;
+  font-size:3rem;
   font-weight:900;
-  margin-bottom:20px;
+  color:#00b3ff;
+  letter-spacing:3px;
+  opacity:0;
+  animation:fadeIn 2s ease forwards;
 }
 
-.hero p{
-  font-size:1.1rem;
-  color:#ddd;
-  margin-bottom:25px;
+/* ANIMAÇÕES */
+@keyframes fadeIn{
+  to{
+    opacity:1;
+  }
 }
 
-/* BOTÕES */
-.btn{
-  padding:12px 28px;
-  border-radius:5px;
-  font-weight:600;
-  text-decoration:none;
-  display:inline-block;
-  margin-right:10px;
-  transition:0.3s;
+@keyframes fadeOut{
+  to{
+    opacity:0;
+    visibility:hidden;
+  }
 }
 
-.btn-play{
-  background:#00b3ff;
-  color:#000;
+/* CONTEÚDO PRINCIPAL */
+.main{
+  opacity:0;
+  animation:showMain 1s ease 3.5s forwards;
+  padding:40px;
+  color:white;
 }
 
-.btn-info{
-  background:rgba(255,255,255,0.2);
-  color:#fff;
-}
-
-.btn:hover{
-  transform:scale(1.05);
-}
-
-footer{
-  text-align:center;
-  padding:30px 10px;
-  color:#777;
-  border-top:1px solid #222;
-  font-size:0.9rem;
-}
-
-@media(max-width:768px){
-  .hero h1{
-    font-size:2.2rem;
+@keyframes showMain{
+  to{
+    opacity:1;
   }
 }
 
@@ -110,33 +73,16 @@ footer{
 </head>
 <body>
 
-<header>
+<!-- INTRO -->
+<div class="intro">
   <div class="logo">FG PLAY</div>
-</header>
+</div>
 
-<section class="hero">
-  <div class="hero-content">
-    <h1>SUPERMAN (1941)</h1>
-    <p>
-      A clássica animação de 1941 apresenta o herói enfrentando ameaças poderosas enquanto protege Metrópolis.
-      Uma das produções mais icônicas da era de ouro da animação.
-    </p>
-
-    <!-- BOTÃO QUE MUDA DE PÁGINA -->
-    <a href="SUPERMEN 1941.html" class="btn btn-play">
-      <i class="fas fa-play"></i> Assistir
-    </a>
-
-    <a href="TRAILER DO SUPERMAN 1941.html" class="btn btn-play">
-      <i class="fas fa-play"></i> Trailer
-    </a>
-
-  </div>
-</section>
-
-<footer>
-  © 2026 FG PLAY
-</footer>
+<!-- SITE -->
+<div class="main">
+  <h1>Bem-vindo ao FG PLAY</h1>
+  <p>Seu serviço de streaming gratuito.</p>
+</div>
 
 </body>
 </html>
