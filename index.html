@@ -29,7 +29,6 @@ body{
   justify-content:center;
   align-items:center;
   background:#000;
-  animation:fadeOut 1s ease 3s forwards;
 }
 
 .logo{
@@ -48,41 +47,20 @@ body{
   }
 }
 
-@keyframes fadeOut{
-  to{
-    opacity:0;
-    visibility:hidden;
-  }
-}
-
-/* CONTEÚDO PRINCIPAL */
-.main{
-  opacity:0;
-  animation:showMain 1s ease 3.5s forwards;
-  padding:40px;
-  color:white;
-}
-
-@keyframes showMain{
-  to{
-    opacity:1;
-  }
-}
-
 </style>
 </head>
 <body>
 
-<!-- INTRO -->
 <div class="intro">
   <div class="logo">FG PLAY</div>
 </div>
 
-<!-- SITE -->
-<div class="main">
-  <h1>Bem-vindo ao FG PLAY</h1>
-  <p>Seu serviço de streaming gratuito.</p>
-</div>
+<script>
+  // Tempo total da intro (3 segundos)
+  setTimeout(function(){
+      window.location.href = "FGPLAY.html";
+  }, 3000);
+</script>
 
 </body>
 </html>
