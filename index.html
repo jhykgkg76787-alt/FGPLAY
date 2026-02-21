@@ -40,7 +40,7 @@ body{
   animation:fadeIn 2s ease forwards;
 }
 
-/* ANIMAÇÕES */
+/* ANIMAÇÃO */
 @keyframes fadeIn{
   to{
     opacity:1;
@@ -56,7 +56,10 @@ body{
 </div>
 
 <script>
-  // Tempo total da intro (3 segundos)
+  // Marca automaticamente como assistido
+  localStorage.setItem("superman1941_ep1_assistido", "sim");
+
+  // Depois de 3 segundos vai para a página principal
   setTimeout(function(){
       window.location.href = "FGPLAY.html";
   }, 3000);
