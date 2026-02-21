@@ -142,7 +142,7 @@ footer{
     <p>
       A clássica animação apresenta o herói protegendo Metrópolis contra ameaças incríveis.
     </p>
-
+<button onclick="favoritar('superman1941')">⭐ Favoritar</button>
     <button class="btn" onclick="mostrarPlayer()">
       <i class="fas fa-play"></i> Play
     </button>
@@ -161,6 +161,20 @@ footer{
 
 </section>
 
+<script>
+function favoritar(idFilme){
+  let usuario = localStorage.getItem("usuarioLogado");
+  let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+
+  if(!usuarios[usuario].favoritos.includes(idFilme)){
+    usuarios[usuario].favoritos.push(idFilme);
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    alert("Adicionado aos favoritos!");
+  } else {
+    alert("Já está nos favoritos");
+  }
+}
+</script>
 <footer>
   © 2026 FG PLAY
 </footer>
