@@ -4,66 +4,248 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FG PLAY</title>
-
 <style>
-
-/* RESET */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
 body{
   background:#000;
+  color:white;
   font-family:Arial, Helvetica, sans-serif;
-  overflow:hidden;
+  margin:0;
+  padding:0;
 }
 
-/* INTRO */
-.intro{
-  position:fixed;
-  width:100%;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#000;
+/* LOGIN */
+#loginContainer{
+  display:block;
+  text-align:center;
+  padding:50px;
 }
 
-.logo{
-  font-size:3rem;
+input{
+  display:block;
+  margin:10px auto;
+  padding:10px;
+  width:250px;
+  border-radius:5px;
+  border:none;
+}
+
+button{
+  padding:10px 20px;
+  margin-top:10px;
+  border:none;
+  border-radius:5px;
+  background:#00b3ff;
+  color:#000;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+#preview{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:10px;
+  background:#333;
+}
+
+/* PÁGINA PRINCIPAL */
+#mainPage{
+  display:none;
+  padding:20px;
+}
+
+header{
+  padding:20px 5%;
+  font-size:1.5rem;
   font-weight:900;
   color:#00b3ff;
-  letter-spacing:3px;
-  opacity:0;
-  animation:fadeIn 2s ease forwards;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-/* ANIMAÇÃO */
-@keyframes fadeIn{
-  to{
-    opacity:1;
-  }
+#userMenu{position:relative;}
+#userMenu img{width:50px;height:50px;border-radius:50%;cursor:pointer;}
+#menuDropdown{
+  display:none;
+  position:absolute;
+  right:0;
+  top:60px;
+  background:#1a1a1a;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+  min-width:150px;
+  text-align:left;
+  z-index:10;
+}
+#menuDropdown p{margin:5px 0;}
+#menuDropdown button{
+  width:100%;
+  background:#00b3ff;
+  color:#000;
+  cursor:pointer;
 }
 
+.section{padding:20px 5%;}
+.section h2{margin-bottom:15px;}
+.movies{
+  display:flex;
+  gap:15px;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+}
+.movies::-webkit-scrollbar{display:none;}
+.card{
+  min-width:180px;
+  height:270px;
+  border-radius:8px;
+  overflow:hidden;
+  cursor:pointer;
+  position:relative;
+  transition:0.3s;
+}
+.card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.card:hover{transform:scale(1.08);}
+.card-title{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  background:linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  padding:10px;
+  font-size:0.9rem;
+}
+footer{
+  text-align:center;
+  padding:30px 10px;
+  color:#777;
+  border-top:1px solid #222;
+  font-size:0.9rem;
+  margin-top:40px;
+}
 </style>
 </head>
 <body>
 
-<div class="intro">
-  <div class="logo">FG PLAY</div>
+<!-- LOGIN / CADASTRO -->
+<div id="loginContainer">
+  <h1>FG PLAY</h1>
+  <input type="text" id="usuario" placeholder="Usuário">
+  <input type="password" id="senha" placeholder="Senha">
+  <input type="file" id="foto" accept="image/*">
+  <img id="preview" src="" alt="Preview da Foto">
+  <button onclick="Entrar()">Entrar</button>
+</div>
+
+<!-- PÁGINA PRINCIPAL -->
+<div id="mainPage">
+  <header>
+    FG PLAY
+    <div id="userMenu">
+      <img id="profilePic" src="" alt="Perfil" onclick="toggleMenu()">
+      <div id="menuDropdown">
+        <p id="menuNome"></p>
+        <button onclick="logout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2>Séries</h2>
+    <div class="movies">
+      <a href="SUPERMEN 1941.html" class="card">
+        <img src="https://github.com/user-attachments/assets/c176da8e-d1b9-4c14-973d-460abf2b08d0">
+        <div class="card-title">SUPERMAN (1941)</div>
+      </a>
+    </div>
+  </section>
+
+  <footer>© 2026 FG PLAY</footer>
 </div>
 
 <script>
-  // Marca automaticamente como assistido
-  localStorage.setItem("superman1941_ep1_assistido", "sim");
+// Preview da foto
+document.getElementById("foto").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(event){
+      document.getElementById("preview").src = event.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+});
 
-  // Depois de 3 segundos vai para a página principal
-  setTimeout(function(){
-      window.location.href = "FGPLAY.html";
-  }, 3000);
+// CADASTRO
+function Entrar(){
+  const usuario = document.getElementById("usuario").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+  const foto = document.getElementById("preview").src;
+
+  if(!usuario || !senha || !foto){
+    alert("Preencha todos os campos e adicione uma foto");
+    return;
+  }
+
+  let usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+  if(usuarios[usuario]){ alert("Usuário já existe!"); return; }
+
+  usuarios[usuario] = { senha: senha, foto: foto };
+  localStorage.setItem("usuarios", JSON.stringify(usuarios));
+  localStorage.setItem("usuarioLogado", usuario);
+
+  mostrarMainPage();
+}
+
+// LOGIN
+function login(){
+  const usuario = document.getElementById("usuario").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+  let usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+
+  if(usuarios[usuario] && usuarios[usuario].senha === senha){
+    localStorage.setItem("usuarioLogado", usuario);
+    mostrarMainPage();
+  } else { alert("Usuário ou senha incorretos"); }
+}
+
+// MOSTRAR PÁGINA PRINCIPAL
+function mostrarMainPage(){
+  const usuario = localStorage.getItem("usuarioLogado");
+  let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+  const userData = usuarios[usuario];
+
+  document.getElementById("profilePic").src = userData.foto;
+  document.getElementById("menuNome").innerText = "Usuário: " + usuario;
+
+  document.getElementById("loginContainer").style.display = "none";
+  document.getElementById("mainPage").style.display = "block";
+}
+
+// MENU
+function toggleMenu(){
+  const menu = document.getElementById("menuDropdown");
+  menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+// LOGOUT
+function logout(){
+  localStorage.removeItem("usuarioLogado");
+  location.reload();
+}
+
+// AUTO LOGIN
+window.addEventListener("load", ()=>{
+  const usuario = localStorage.getItem("usuarioLogado");
+  if(usuario){
+    mostrarMainPage();
+  }
+});
 </script>
-
 </body>
 </html>
