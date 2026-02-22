@@ -96,7 +96,7 @@ header{display:flex;justify-content:space-between;align-items:center;padding:15p
             <div class="hero-content">
                 <h1 id="heroTitle" style="font-size:3rem;margin-bottom:20px">Título</h1>
                 <button class="btn-main" onclick="assistirAgora()">▶ ASSISTIR AGORA</button>
-                <button class="btn-sec" onclick="toggleFav()">⭐ MINHA LISTA</button>
+                <button id="btnFav" class="btn-sec" onclick="toggleFav()">Adicionar na Minha Lista</button>
                 <button class="btn-sec" onclick="verTrailer()" style="margin-left:10px">🎬 TRAILER</button>
                 <button onclick="voltarHome()" style="display:block;margin-top:30px;background:none;color:var(--primary)">← Voltar para o início</button>
             </div>
@@ -141,7 +141,6 @@ function salvarPerfil(){
   const nome=document.getElementById("newName").value.trim();
   if(!nome) return alert("Digite um nome");
   let users=JSON.parse(localStorage.getItem("fg_users"))||{};
-  // Cada perfil mantém seu histórico e favoritos independentes
   users[nome]={foto:fotoBase64,favoritos:[],assistindo:[]};
   localStorage.setItem("fg_users",JSON.stringify(users));
   fotoBase64="";
@@ -177,7 +176,28 @@ function abrirDetalhes(id){
   document.getElementById("detalhesPage").classList.remove("hidden");
   document.getElementById("heroTitle").innerText=filmeAtual.titulo;
   document.getElementById("heroBg").style.backgroundImage=`url(${filmeAtual.imagem})`;
+  updateFavButton();
   window.scrollTo(0,0);
+}
+
+function updateFavButton(){
+  const users=JSON.parse(localStorage.getItem("fg_users"));
+  const btn=document.getElementById("btnFav");
+  const existe=(users[userAtivo].favoritos||[]).find(f=>f.id===filmeAtual.id);
+  btn.innerText = existe ? "Tirar da Minha Lista" : "Adicionar na Minha Lista";
+}
+
+function toggleFav(){
+  const users=JSON.parse(localStorage.getItem("fg_users"));
+  let favs=users[userAtivo].favoritos||[];
+  const existe=favs.find(f=>f.id===filmeAtual.id);
+  if(existe){
+    favs=favs.filter(f=>f.id!==filmeAtual.id);
+  } else favs.push(filmeAtual);
+  users[userAtivo].favoritos=favs;
+  localStorage.setItem("fg_users",JSON.stringify(users));
+  updateFavButton();
+  renderHome();
 }
 
 function assistirAgora(){
@@ -189,18 +209,6 @@ function assistirAgora(){
   localStorage.setItem("fg_users",JSON.stringify(users));
   document.getElementById("videoPlayer").src=filmeAtual.url;
   document.getElementById("playerPage").classList.remove("hidden");
-}
-
-function toggleFav(){
-  const users=JSON.parse(localStorage.getItem("fg_users"));
-  let favs=users[userAtivo].favoritos||[];
-  const existe=favs.find(x=>x.id===filmeAtual.id);
-  if(existe) favs=favs.filter(x=>x.id!==filmeAtual.id);
-  else favs.push(filmeAtual);
-  users[userAtivo].favoritos=favs;
-  localStorage.setItem("fg_users",JSON.stringify(users));
-  alert("Lista atualizada!");
-  renderHome();
 }
 
 function filtrar(){
@@ -255,6 +263,5 @@ window.addEventListener("load",()=>{
   else renderPerfis();
 });
 </script>
-
 </body>
 </html>
