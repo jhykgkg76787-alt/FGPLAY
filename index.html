@@ -10,7 +10,6 @@
 body{font-family:Arial;background:#0f0f0f;color:#fff;}
 button{cursor:pointer;border:none;border-radius:5px;padding:10px 15px;font-weight:bold;}
 input{padding:10px;border-radius:5px;border:none;margin:5px 0;width:100%;}
-
 .hidden{display:none;}
 
 header{
@@ -71,7 +70,9 @@ background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);
 font-size:0.9rem;
 }
 
+/* HERO FILME */
 .hero{
+position:relative;
 height:100vh;
 display:flex;
 flex-direction:column;
@@ -83,6 +84,28 @@ url('https://github.com/user-attachments/assets/c176da8e-d1b9-4c14-973d-460abf2b
 }
 
 .hero h1{font-size:3rem;margin-bottom:20px;}
+
+.back-btn{
+position:absolute;
+top:20px;
+left:20px;
+background:rgba(0,0,0,0.6);
+color:#fff;
+font-size:18px;
+padding:8px 12px;
+border-radius:50%;
+}
+
+.hero-buttons{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.hero-buttons button{
+background:#fff;
+color:#000;
+}
 
 .login-container{
 max-width:300px;
@@ -149,13 +172,19 @@ border-top:1px solid #222;
 
 <!-- FILME -->
 <div id="filmePage" class="hidden">
-
 <section class="hero">
-<h1>SUPERMAN (1941)</h1>
-<button onclick="favoritar()">⭐ Favoritar</button>
-<button onclick="voltarHome()">← Voltar</button>
-</section>
 
+<button class="back-btn" onclick="voltarHome()">←</button>
+
+<h1>SUPERMAN (1941)</h1>
+
+<div class="hero-buttons">
+<button onclick="favoritar()">⭐ Favoritar</button>
+<button onclick="playFilme()">▶ Play</button>
+<button onclick="verTrailer()">🎬 Trailer</button>
+</div>
+
+</section>
 </div>
 
 <footer>© 2026 FG PLAY</footer>
@@ -200,7 +229,6 @@ localStorage.setItem("usuarioLogado",usuario);
 mostrarHome();
 }
 
-// Mostrar Home
 function mostrarHome(){
 document.getElementById("loginPage").classList.add("hidden");
 document.getElementById("homePage").classList.remove("hidden");
@@ -213,7 +241,6 @@ document.getElementById("fotoPerfil").src=usuarios[usuario].foto;
 carregarLista();
 }
 
-// Favoritar
 function favoritar(){
 let usuario=localStorage.getItem("usuarioLogado");
 let usuarios=JSON.parse(localStorage.getItem("usuarios"));
@@ -227,7 +254,6 @@ alert("Já está na lista");
 }
 }
 
-// Carregar lista
 function carregarLista(){
 let usuario=localStorage.getItem("usuarioLogado");
 let usuarios=JSON.parse(localStorage.getItem("usuarios"));
@@ -243,7 +269,6 @@ container.innerHTML+=`
 });
 }
 
-// Navegação
 function abrirFilme(){
 document.getElementById("homePage").classList.add("hidden");
 document.getElementById("filmePage").classList.remove("hidden");
@@ -258,7 +283,14 @@ localStorage.removeItem("usuarioLogado");
 location.reload();
 }
 
-// Auto login
+function playFilme(){
+window.open("https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview","_blank");
+}
+
+function verTrailer(){
+window.open("https://youtu.be/SaGseDvQ2RI?si=VSn9fv3rE-zfjfgH","_blank");
+}
+
 window.onload=()=>{
 if(localStorage.getItem("usuarioLogado")){
 mostrarHome();
