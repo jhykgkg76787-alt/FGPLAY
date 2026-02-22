@@ -1,172 +1,107 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FG PLAY - Premium</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #0b0b0b; color: #fff; overflow-x: hidden; transition: 0.3s; }
-        body.light { background: #f2f2f2; color: #111; }
-        .hidden { display: none !important; }
-        button { cursor: pointer; border: none; transition: 0.3s; }
-
-        /* LOGIN */
-        .login-container {
-            min-height: 100vh; display: flex; justify-content: center; align-items: center;
-            background: linear-gradient(135deg, #000, #111, #00b3ff33);
-        }
-        .login-box {
-            background: #141414; padding: 40px; border-radius: 12px; width: 90%; max-width: 350px;
-            text-align: center; box-shadow: 0 0 40px rgba(0, 179, 255, 0.2);
-        }
-        .login-box h1 { color: #00b3ff; margin-bottom: 20px; font-weight: 900; }
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 6px; background: #222; color: #fff; }
-        .login-box button { width: 100%; padding: 12px; background: #00b3ff; color: white; border-radius: 6px; font-weight: bold; }
-        #preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 10px auto; display: none; border: 2px solid #00b3ff; }
-
-        /* HEADER */
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5%; background: rgba(0,0,0,0.9); position: fixed; top: 0; width: 100%; z-index: 100;
-            gap: 10px; backdrop-filter: blur(10px);
-        }
-        .logo { color: #00b3ff; font-weight: 900; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
-        
-        .search-container { flex-grow: 1; max-width: 400px; position: relative; }
-        .search-container input {
-            width: 100%; padding: 10px 18px; border-radius: 25px; border: 1px solid #333;
-            background: #1a1a1a; color: #fff; outline: none; transition: 0.3s;
-        }
-        .search-container input:focus { border-color: #00b3ff; box-shadow: 0 0 10px rgba(0, 179, 255, 0.3); }
-
-        .header-actions { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
-        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #00b3ff; object-fit: cover; }
-
-        /* HERO / DETALHES */
-        .hero {
-            height: 60vh; display: flex; flex-direction: column; justify-content: center;
-            padding: 0 5%; background-size: cover; background-position: center;
-            position: relative;
-        }
-        .hero::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to top, #0b0b0b, transparent), linear-gradient(to right, rgba(0,0,0,0.8), transparent);
-        }
-        .hero-content { position: relative; z-index: 2; max-width: 600px; }
-        .hero h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 10px #000; }
-        .hero-btns { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-fav { background: rgba(255,255,255,0.2); color: #fff; padding: 12px 20px; border-radius: 5px; backdrop-filter: blur(5px); font-weight: bold; }
-        .btn-back { position: absolute; top: 90px; left: 5%; z-index: 10; background: rgba(0,0,0,0.5); color: #fff; padding: 8px 15px; border-radius: 20px; }
-
-        /* EPISÓDIOS */
-        .episodes-section { padding: 20px 5%; }
-        .episodes-section h3 { margin-bottom: 20px; border-left: 4px solid #00b3ff; padding-left: 10px; }
-        .episode-item {
-            background: #1a1a1a; margin-bottom: 10px; padding: 15px; border-radius: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: 0.3s;
-        }
-        .episode-item:hover { background: #252525; transform: translateX(10px); color: #00b3ff; }
-
-        /* SEÇÕES HOME */
-        .section { padding: 40px 5% 0; transition: 0.5s; }
-        .section h2 { margin-bottom: 15px; color: #00b3ff; font-size: 1.3rem; }
-        .movies { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
-        .movies::-webkit-scrollbar { height: 5px; }
-        .movies::-webkit-scrollbar-thumb { background: #00b3ff; border-radius: 10px; }
-        
-        .card {
-            min-width: 170px; height: 250px; border-radius: 8px; overflow: hidden;
-            position: relative; cursor: pointer; background: #111; transition: 0.3s;
-        }
-        .card:hover { transform: scale(1.05); z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
-        .card img { width: 100%; height: 100%; object-fit: cover; }
-        .card-title {
-            position: absolute; bottom: 0; width: 100%; padding: 10px;
-            background: linear-gradient(to top, #000, transparent); font-size: 0.8rem; text-align: center;
-        }
-
-        /* PLAYER */
-        .playerPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; }
-        .playerPage iframe { width: 100%; height: 100%; border: none; }
-        .close-player { position: absolute; top: 20px; left: 20px; z-index: 2100; background: #00b3ff; color: white; padding: 10px 20px; border-radius: 30px; }
-
-        footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FG PLAY | Premium Streaming</title>
+<style>
+:root{--primary:#00b3ff;--bg:#0b0b0b;--card-bg:#141414;--text:#fff;}
+body.light{--bg:#f2f2f2;--text:#111;--card-bg:#fff;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:var(--bg);color:var(--text);overflow-x:hidden;transition:.3s;}
+.hidden{display:none !important;}
+button{cursor:pointer;border:none;transition:.3s;}
+.profile-selector{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#000;}
+.profiles-list{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;}
+.profile-item{text-align:center;width:140px;cursor:pointer;position:relative;}
+.profile-avatar{width:130px;height:130px;border-radius:12px;object-fit:cover;background:#222;border:3px solid transparent;}
+.profile-item:hover .profile-avatar{border-color:var(--primary);transform:scale(1.05);}
+.delete-btn{position:absolute;top:-10px;right:-5px;background:red;color:white;border-radius:50%;width:25px;height:25px;font-size:12px;}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px 5%;background:rgba(0,0,0,.95);position:fixed;top:0;width:100%;z-index:100;backdrop-filter:blur(10px);gap:15px;}
+.logo{color:var(--primary);font-weight:900;font-size:1.5rem;cursor:pointer;}
+.search-box{flex-grow:1;max-width:400px;}
+.search-box input{width:100%;padding:10px 20px;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:white;}
+.section{padding:100px 5% 0;}
+.movies{display:flex;gap:15px;overflow-x:auto;padding-bottom:20px;scroll-behavior:smooth;}
+.card{min-width:170px;height:250px;border-radius:8px;overflow:hidden;position:relative;cursor:pointer;background:var(--card-bg);transition:.3s;box-shadow:0 4px 10px rgba(0,0,0,.3);}
+.card:hover{transform:scale(1.05);z-index:10;}
+.card img{width:100%;height:100%;object-fit:cover;}
+.card-title{position:absolute;bottom:0;width:100%;padding:10px;background:linear-gradient(transparent,#000);color:#fff;font-size:.8rem;text-align:center;}
+.hero{height:60vh;background-size:cover;background-position:center;position:relative;display:flex;align-items:center;padding:0 5%;}
+.hero::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to top,var(--bg),transparent);}
+.hero-content{position:relative;z-index:2;max-width:600px;}
+.btn-main{background:var(--primary);color:white;padding:12px 25px;border-radius:5px;font-weight:bold;margin-right:10px;}
+.btn-sec{background:rgba(255,255,255,.2);color:var(--text);padding:12px 25px;border-radius:5px;backdrop-filter:blur(5px);}
+.playerPage{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:3000;}
+.playerPage iframe{width:100%;height:100%;border:none;}
+.close-player{position:absolute;top:20px;left:20px;z-index:3100;background:var(--primary);color:white;padding:10px 20px;border-radius:30px;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;justify-content:center;align-items:center;z-index:2000;}
+.modal-box{background:#181818;padding:30px;border-radius:15px;text-align:center;width:320px;}
+.modal-box input{width:100%;padding:10px;margin:10px 0;border-radius:5px;border:none;}
+</style>
 </head>
 <body>
 
-<div id="loginPage" class="login-container">
-    <div class="login-box">
-        <h1>FG PLAY</h1>
-        <input type="text" id="usuario" placeholder="Nome de usuário">
-        <input type="password" id="senha" placeholder="Senha">
-        <input type="file" id="fotoInput" accept="image/*">
-        <img id="preview">
-        <button onclick="entrar()">ENTRAR</button>
+<div id="profilePage" class="profile-selector">
+    <h1 style="color:white;margin-bottom:30px;">Quem está assistindo?</h1>
+    <div class="profiles-list" id="listaPerfis"></div>
+</div>
+
+<div id="createModal" class="modal hidden">
+    <div class="modal-box">
+        <h2 style="color:white">Novo Perfil</h2>
+        <input type="text" id="newName" placeholder="Nome do perfil">
+        <input type="file" id="newFile" accept="image/*">
+        <button class="btn-main" onclick="salvarPerfil()" style="width:100%;margin-top:10px;">CRIAR</button>
+        <button onclick="fecharModal()" style="background:none;color:gray;margin-top:10px;">Cancelar</button>
     </div>
 </div>
 
 <div id="site" class="hidden">
     <header>
-        <div class="logo" onclick="limparBuscaEVoltar()">FG PLAY</div>
-        
-        <div class="search-container">
-            <input type="text" id="inputBusca" placeholder="O que vamos assistir hoje?" oninput="gerenciarPesquisa()">
+        <div class="logo" onclick="voltarHome()">FG PLAY</div>
+        <div class="search-box">
+            <input type="text" id="inputBusca" placeholder="Pesquisar filmes..." oninput="filtrar()">
         </div>
-
-        <div class="header-actions">
-            <button onclick="document.body.classList.toggle('light')" style="background:none; font-size:1.2rem;">🌙</button>
-            <img id="userImg" class="profile-img">
-            <button onclick="logout()" style="background:none; color:#ff4444; font-weight:bold;">Sair</button>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <button onclick="document.body.classList.toggle('light')" style="background:none;font-size:1.2rem;">🌓</button>
+            <img id="userImg" style="width:35px;height:35px;border-radius:50%;border:2px solid var(--primary);cursor:pointer" onclick="logout()">
         </div>
     </header>
 
     <main id="homeContent">
-        <section id="sectionBusca" class="section hidden" style="padding-top: 100px;">
-            <h2 id="titleBusca">Resultados da Pesquisa</h2>
-            <div class="movies" id="containerResultados"></div>
-            <hr style="border: 0; border-top: 1px solid #222; margin-top: 20px;">
+        <section id="sectionBusca" class="section hidden">
+            <h2>Resultados</h2>
+            <div class="movies" id="resBusca"></div>
         </section>
 
-        <div id="conteudoNormal">
-            <section class="section" style="padding-top: 100px;">
-                <h2 id="titleAssistindo" class="hidden">Assistindo</h2>
-                <div class="movies" id="assistindoLista"></div>
-            </section>
+        <section class="section">
+            <h2 id="tAssistindo" class="hidden">Continuar Assistindo</h2>
+            <div class="movies" id="listaAssistindo"></div>
+        </section>
 
-            <section class="section">
-                <h2 id="titleLista" class="hidden">Minha Lista</h2>
-                <div class="movies" id="minhaLista"></div>
-            </section>
+        <section class="section">
+            <h2 id="tLista" class="hidden">Minha Lista</h2>
+            <div class="movies" id="listaFavoritos"></div>
+        </section>
 
-            <section class="section">
-                <h2>Catálogo Completo</h2>
-                <div class="movies" id="catalogo"></div>
-            </section>
-        </div>
+        <section class="section">
+            <h2>Catálogo Completo</h2>
+            <div class="movies" id="catalogo"></div>
+        </section>
     </main>
 
-    <div id="detalhesPage" class="hidden">
-        <button class="btn-back" onclick="voltarHome()">← Voltar</button>
+    <div id="detalhesPage" class="hidden" style="padding-top:70px">
         <section class="hero" id="heroBg">
             <div class="hero-content">
-                <h1 id="heroTitle">Título</h1>
-                <div class="hero-btns">
-                    <button class="btn-fav" id="btnFav" onclick="toggleFavorito()">⭐ Minha Lista</button>
-                    <button class="btn-fav" onclick="verTrailer()">🎬 Trailer</button>
-                </div>
+                <h1 id="heroTitle" style="font-size:3rem;margin-bottom:20px">Título</h1>
+                <button class="btn-main" onclick="assistirAgora()">▶ ASSISTIR AGORA</button>
+                <button class="btn-sec" onclick="toggleFav()">⭐ MINHA LISTA</button>
+                <button class="btn-sec" onclick="verTrailer()" style="margin-left:10px">🎬 TRAILER</button>
+                <button onclick="voltarHome()" style="display:block;margin-top:30px;background:none;color:var(--primary)">← Voltar para o início</button>
             </div>
         </section>
-
-        <div class="episodes-section">
-            <h3>Temporada 1</h3>
-            <div id="listaEpisodios"></div>
-        </div>
     </div>
-
-    <footer>© 2026 FG PLAY</footer>
 </div>
 
 <div id="playerPage" class="playerPage hidden">
@@ -175,219 +110,150 @@
 </div>
 
 <script>
-    /* BANCO DE DADOS */
-    const CATALOGO = [
-        {
-            id: "superman1941",
-            titulo: "SUPERMAN (1941)",
-            imagem: "https://github.com/user-attachments/assets/c176da8e-d1b9-4c14-973d-460abf2b08d0",
-            trailer: "https://www.youtube.com/embed/SaGseDvQ2RI",
-            episodios: [
-                { numero: 1, nome: "1. O Cientista Louco", url: "https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview" },
-                { numero: 2, nome: "2. Os Monstros Mecânicos", url: "https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview" }
-            ]
-        }
-        // Adicione mais aqui...
-    ];
+const CATALOGO=[{id:"superman1",titulo:"Superman (1941)",imagem:"https://github.com/user-attachments/assets/c176da8e-d1b9-4c14-973d-460abf2b08d0",url:"https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview",trailer:"https://www.youtube.com/embed/SaGseDvQ2RI"}];
 
-    let filmeSelecionado = null;
+let userAtivo=null;
+let filmeAtual=null;
+let fotoBase64="";
 
-    /* LOGIN */
-    const fotoInput = document.getElementById("fotoInput");
-    const preview = document.getElementById("preview");
+function renderPerfis(){
+  const users=JSON.parse(localStorage.getItem("fg_users"))||{};
+  const container=document.getElementById("listaPerfis");
+  container.innerHTML="";
+  Object.keys(users).forEach(nome=>{
+    const div=document.createElement("div");
+    div.className="profile-item";
+    div.innerHTML=`
+      <button class="delete-btn" onclick="event.stopPropagation();deletarUser('${nome}')">✕</button>
+      <img src="${users[nome].foto||'https://via.placeholder.com/130'}" class="profile-avatar">
+      <p style="color:white;margin-top:10px">${nome}</p>`;
+    div.addEventListener("click",()=>logar(nome));
+    container.appendChild(div);
+  });
+  const add=document.createElement("div");
+  add.className="profile-item";
+  add.innerHTML=`<div class="profile-avatar" style="display:flex;justify-content:center;align-items:center;font-size:3rem;color:#444;border:2px dashed #333">+</div><p style="color:white;margin-top:10px">Adicionar</p>`;
+  add.addEventListener("click",()=>document.getElementById("createModal").classList.remove("hidden"));
+  container.appendChild(add);
+}
 
-    fotoInput.onchange = () => {
-        const file = fotoInput.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = e => { preview.src = e.target.result; preview.style.display = "block"; };
-            reader.readAsDataURL(file);
-        }
-    };
+function salvarPerfil(){
+  const nome=document.getElementById("newName").value.trim();
+  if(!nome) return alert("Digite um nome");
+  let users=JSON.parse(localStorage.getItem("fg_users"))||{};
+  // Cada perfil mantém seu histórico e favoritos independentes
+  users[nome]={foto:fotoBase64,favoritos:[],assistindo:[]};
+  localStorage.setItem("fg_users",JSON.stringify(users));
+  fotoBase64="";
+  fecharModal();
+  renderPerfis();
+}
 
-    function entrar() {
-        const user = document.getElementById("usuario").value.trim();
-        const pass = document.getElementById("senha").value.trim();
-        if (!user || !pass) return alert("Preencha tudo!");
-        let usuarios = JSON.parse(localStorage.getItem("fg_usuarios")) || {};
-        if (!usuarios[user]) {
-            usuarios[user] = { senha: pass, foto: preview.src || '', favoritos: [], assistindo: [] };
-        } else if (usuarios[user].senha !== pass) {
-            return alert("Senha incorreta!");
-        }
-        localStorage.setItem("fg_usuarios", JSON.stringify(usuarios));
-        localStorage.setItem("fg_logado", user);
-        iniciarApp();
-    }
+function logar(nome){
+  userAtivo=nome;
+  localStorage.setItem("fg_sessao",nome);
+  document.getElementById("profilePage").classList.add("hidden");
+  document.getElementById("site").classList.remove("hidden");
+  const users=JSON.parse(localStorage.getItem("fg_users"));
+  document.getElementById("userImg").src=users[nome].foto||"https://via.placeholder.com/35";
+  renderHome();
+}
 
-    function iniciarApp() {
-        document.getElementById("loginPage").classList.add("hidden");
-        document.getElementById("site").classList.remove("hidden");
-        const user = localStorage.getItem("fg_logado");
-        const usuarios = JSON.parse(localStorage.getItem("fg_usuarios"));
-        document.getElementById("userImg").src = usuarios[user].foto || 'https://via.placeholder.com/40';
-        renderCatalogoPadrao();
-        voltarHome();
-    }
+function renderHome(){
+  const users=JSON.parse(localStorage.getItem("fg_users"));
+  const dados=users[userAtivo];
+  document.getElementById("catalogo").innerHTML=CATALOGO.map(f=>`<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"><div class="card-title">${f.titulo}</div></div>`).join('');
+  const fv=dados.favoritos||[];
+  document.getElementById("listaFavoritos").innerHTML=fv.map(f=>`<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"><div class="card-title">${f.titulo}</div></div>`).join('');
+  document.getElementById("tLista").classList.toggle("hidden", fv.length===0);
+  const as=dados.assistindo||[];
+  document.getElementById("listaAssistindo").innerHTML=as.map(f=>`<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"><div class="card-title">${f.titulo}</div></div>`).join('');
+  document.getElementById("tAssistindo").classList.toggle("hidden", as.length===0);
+}
 
-    /* LOGICA DE PESQUISA AVANÇADA */
-    function gerenciarPesquisa() {
-        const termo = document.getElementById("inputBusca").value.toLowerCase();
-        const sectionBusca = document.getElementById("sectionBusca");
-        const conteudoNormal = document.getElementById("conteudoNormal");
-        const containerResultados = document.getElementById("containerResultados");
-        const titleBusca = document.getElementById("titleBusca");
+function abrirDetalhes(id){
+  filmeAtual=CATALOGO.find(f=>f.id===id);
+  document.getElementById("homeContent").classList.add("hidden");
+  document.getElementById("detalhesPage").classList.remove("hidden");
+  document.getElementById("heroTitle").innerText=filmeAtual.titulo;
+  document.getElementById("heroBg").style.backgroundImage=`url(${filmeAtual.imagem})`;
+  window.scrollTo(0,0);
+}
 
-        if (termo.length > 0) {
-            // Mostra busca e esconde o resto
-            sectionBusca.classList.remove("hidden");
-            conteudoNormal.classList.add("hidden");
+function assistirAgora(){
+  const users=JSON.parse(localStorage.getItem("fg_users"));
+  let hist=users[userAtivo].assistindo||[];
+  hist=hist.filter(x=>x.id!==filmeAtual.id);
+  hist.unshift(filmeAtual);
+  users[userAtivo].assistindo=hist.slice(0,10);
+  localStorage.setItem("fg_users",JSON.stringify(users));
+  document.getElementById("videoPlayer").src=filmeAtual.url;
+  document.getElementById("playerPage").classList.remove("hidden");
+}
 
-            const filtrados = CATALOGO.filter(item => item.titulo.toLowerCase().includes(termo));
-            
-            if (filtrados.length > 0) {
-                titleBusca.innerText = `Resultados para "${termo}"`;
-                containerResultados.innerHTML = filtrados.map(f => `
-                    <div class="card" onclick="abrirDetalhes('${f.id}')">
-                        <img src="${f.imagem}">
-                        <div class="card-title">${f.titulo}</div>
-                    </div>
-                `).join('');
-            } else {
-                titleBusca.innerText = "Nenhum resultado encontrado...";
-                containerResultados.innerHTML = "";
-            }
-        } else {
-            // Volta ao normal
-            sectionBusca.classList.add("hidden");
-            conteudoNormal.classList.remove("hidden");
-        }
-    }
+function toggleFav(){
+  const users=JSON.parse(localStorage.getItem("fg_users"));
+  let favs=users[userAtivo].favoritos||[];
+  const existe=favs.find(x=>x.id===filmeAtual.id);
+  if(existe) favs=favs.filter(x=>x.id!==filmeAtual.id);
+  else favs.push(filmeAtual);
+  users[userAtivo].favoritos=favs;
+  localStorage.setItem("fg_users",JSON.stringify(users));
+  alert("Lista atualizada!");
+  renderHome();
+}
 
-    function limparBuscaEVoltar() {
-        document.getElementById("inputBusca").value = "";
-        gerenciarPesquisa();
-        voltarHome();
-    }
+function filtrar(){
+  const t=document.getElementById("inputBusca").value.toLowerCase();
+  const container=document.getElementById("sectionBusca");
+  if(t.length>0){
+    container.classList.remove("hidden");
+    const res=CATALOGO.filter(f=>f.titulo.toLowerCase().includes(t));
+    document.getElementById("resBusca").innerHTML=res.map(f=>`<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"><div class="card-title">${f.titulo}</div></div>`).join('');
+  } else container.classList.add("hidden");
+}
 
-    /* RENDERS */
-    function renderCatalogoPadrao() {
-        document.getElementById("catalogo").innerHTML = CATALOGO.map(f => `
-            <div class="card" onclick="abrirDetalhes('${f.id}')">
-                <img src="${f.imagem}">
-                <div class="card-title">${f.titulo}</div>
-            </div>
-        `).join('');
-    }
+function verTrailer(){
+  document.getElementById("videoPlayer").src=filmeAtual.trailer;
+  document.getElementById("playerPage").classList.remove("hidden");
+}
 
-    function abrirDetalhes(id) {
-        filmeSelecionado = CATALOGO.find(f => f.id === id);
-        document.getElementById("homeContent").classList.add("hidden");
-        document.getElementById("detalhesPage").classList.remove("hidden");
-        document.getElementById("heroTitle").innerText = filmeSelecionado.titulo;
-        document.getElementById("heroBg").style.backgroundImage = `url(${filmeSelecionado.imagem})`;
+function fecharPlayer(){
+  document.getElementById("playerPage").classList.add("hidden");
+  document.getElementById("videoPlayer").src="";
+}
 
-        document.getElementById("listaEpisodios").innerHTML = filmeSelecionado.episodios.map(ep => `
-            <div class="episode-item" onclick="playEpisodio(${ep.numero})">
-                <strong>${ep.nome}</strong>
-                <span>▶</span>
-            </div>
-        `).join('');
-        atualizarBotaoFav();
-        window.scrollTo(0,0);
-    }
+function voltarHome(){
+  document.getElementById("homeContent").classList.remove("hidden");
+  document.getElementById("detalhesPage").classList.add("hidden");
+  document.getElementById("inputBusca").value="";
+  document.getElementById("sectionBusca").classList.add("hidden");
+  renderHome();
+}
 
-    function playEpisodio(num) {
-        const ep = filmeSelecionado.episodios.find(e => e.numero === num);
-        registrarAssistindo(ep);
-        document.getElementById("videoPlayer").src = ep.url;
-        document.getElementById("playerPage").classList.remove("hidden");
-    }
+function deletarUser(nome){
+  if(confirm("Excluir perfil?")){
+    let users=JSON.parse(localStorage.getItem("fg_users"));
+    delete users[nome];
+    localStorage.setItem("fg_users",JSON.stringify(users));
+    renderPerfis();
+  }
+}
 
-    function registrarAssistindo(ep) {
-        const user = localStorage.getItem("fg_logado");
-        let usuarios = JSON.parse(localStorage.getItem("fg_usuarios"));
-        let historico = usuarios[user].assistindo || [];
-        const item = { id: filmeSelecionado.id, titulo: `${filmeSelecionado.titulo} - Ep ${ep.numero}`, imagem: filmeSelecionado.imagem };
-        historico = historico.filter(h => h.id !== item.id);
-        historico.unshift(item);
-        if(historico.length > 10) historico.pop();
-        usuarios[user].assistindo = historico;
-        localStorage.setItem("fg_usuarios", JSON.stringify(usuarios));
-    }
+function fecharModal(){document.getElementById("createModal").classList.add("hidden");}
+function logout(){localStorage.removeItem("fg_sessao");location.reload();}
 
-    function renderAssistindo() {
-        const user = localStorage.getItem("fg_logado");
-        const usuarios = JSON.parse(localStorage.getItem("fg_usuarios"));
-        const historico = usuarios[user].assistindo || [];
-        const container = document.getElementById("assistindoLista");
-        if (historico.length > 0) {
-            document.getElementById("titleAssistindo").classList.remove("hidden");
-            container.innerHTML = historico.map(h => `
-                <div class="card" onclick="abrirDetalhes('${h.id}')">
-                    <img src="${h.imagem}">
-                    <div class="card-title">${h.titulo}</div>
-                </div>
-            `).join('');
-        } else { document.getElementById("titleAssistindo").classList.add("hidden"); }
-    }
+document.getElementById("newFile").addEventListener("change",function(){
+  const reader=new FileReader();
+  reader.onload=e=>fotoBase64=e.target.result;
+  reader.readAsDataURL(this.files[0]);
+});
 
-    function voltarHome() {
-        document.getElementById("homeContent").classList.remove("hidden");
-        document.getElementById("detalhesPage").classList.add("hidden");
-        renderAssistindo();
-        renderMinhaLista();
-    }
-
-    function toggleFavorito() {
-        const user = localStorage.getItem("fg_logado");
-        let usuarios = JSON.parse(localStorage.getItem("fg_usuarios"));
-        let favs = usuarios[user].favoritos;
-        const index = favs.findIndex(f => f.id === filmeSelecionado.id);
-        if (index === -1) favs.push(filmeSelecionado);
-        else favs.splice(index, 1);
-        usuarios[user].favoritos = favs;
-        localStorage.setItem("fg_usuarios", JSON.stringify(usuarios));
-        atualizarBotaoFav();
-    }
-
-    function atualizarBotaoFav() {
-        const user = localStorage.getItem("fg_logado");
-        const usuarios = JSON.parse(localStorage.getItem("fg_usuarios"));
-        const isFav = usuarios[user].favoritos.some(f => f.id === filmeSelecionado.id);
-        document.getElementById("btnFav").innerText = isFav ? "✅ Na Minha Lista" : "⭐ Minha Lista";
-    }
-
-    function renderMinhaLista() {
-        const user = localStorage.getItem("fg_logado");
-        const usuarios = JSON.parse(localStorage.getItem("fg_usuarios"));
-        const favs = usuarios[user].favoritos || [];
-        const container = document.getElementById("minhaLista");
-        if (favs.length > 0) {
-            document.getElementById("titleLista").classList.remove("hidden");
-            container.innerHTML = favs.map(f => `
-                <div class="card" onclick="abrirDetalhes('${f.id}')">
-                    <img src="${f.imagem}">
-                    <div class="card-title">${f.titulo}</div>
-                </div>
-            `).join('');
-        } else { document.getElementById("titleLista").classList.add("hidden"); }
-    }
-
-    function fecharPlayer() {
-        document.getElementById("playerPage").classList.add("hidden");
-        document.getElementById("videoPlayer").src = "";
-        voltarHome();
-    }
-
-    function verTrailer() {
-        document.getElementById("videoPlayer").src = filmeSelecionado.trailer;
-        document.getElementById("playerPage").classList.remove("hidden");
-    }
-
-    function logout() { localStorage.removeItem("fg_logado"); location.reload(); }
-
-    window.onload = () => { if (localStorage.getItem("fg_logado")) iniciarApp(); }
+window.addEventListener("load",()=>{
+  const s=localStorage.getItem("fg_sessao");
+  if(s) logar(s);
+  else renderPerfis();
+});
 </script>
 
 </body>
