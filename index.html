@@ -11,6 +11,7 @@ body{font-family:Arial;background:#0f0f0f;color:#fff;}
 button{cursor:pointer;border:none;border-radius:5px;padding:10px 15px;font-weight:bold;}
 input{padding:10px;border-radius:5px;border:none;margin:5px 0;width:100%;}
 .hidden{display:none;}
+iframe{border:none;}
 
 header{
 display:flex;
@@ -96,17 +97,32 @@ padding:8px 12px;
 border-radius:50%;
 }
 
-.hero-buttons{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
+/* PLAYER */
+.playerPage{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:#000;
+z-index:999;
 }
 
-.hero-buttons button{
-background:#fff;
-color:#000;
+.player-top{
+position:absolute;
+top:0;
+width:100%;
+padding:15px;
+background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+font-weight:bold;
 }
 
+.playerPage iframe{
+width:100%;
+height:100%;
+}
+
+/* LOGIN */
 .login-container{
 max-width:300px;
 margin:100px auto;
@@ -120,13 +136,6 @@ border-radius:50%;
 object-fit:cover;
 background:#222;
 margin-bottom:10px;
-}
-
-footer{
-text-align:center;
-padding:20px;
-color:#777;
-border-top:1px solid #222;
 }
 </style>
 </head>
@@ -144,7 +153,6 @@ border-top:1px solid #222;
 
 <!-- HOME -->
 <div id="homePage" class="hidden">
-
 <header>
 <div class="logo">FG PLAY</div>
 <div class="profile">
@@ -167,27 +175,32 @@ border-top:1px solid #222;
 </div>
 </div>
 </section>
-
 </div>
 
 <!-- FILME -->
 <div id="filmePage" class="hidden">
 <section class="hero">
-
 <button class="back-btn" onclick="voltarHome()">←</button>
-
 <h1>SUPERMAN (1941)</h1>
-
-<div class="hero-buttons">
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
 <button id="btnFavorito" onclick="favoritar()">⭐ Favoritar</button>
-<button onclick="playFilme()">▶ Play</button>
-<button onclick="verTrailer()">🎬 Trailer</button>
+<button onclick="abrirPlayer()">▶ Play</button>
 </div>
-
 </section>
 </div>
 
-<footer>© 2026 FG PLAY</footer>
+<!-- PLAYER -->
+<div id="playerPage" class="playerPage hidden">
+<div class="player-top">
+<button onclick="fecharPlayer()">← Voltar</button>
+SUPERMAN (1941) - T1:E1 O Cientista Louco
+</div>
+<iframe 
+src="https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview"
+allow="autoplay"
+allowfullscreen>
+</iframe>
+</div>
 
 <script>
 const FILME = {
@@ -210,18 +223,18 @@ reader.readAsDataURL(file);
 
 /* LOGIN */
 function entrar(){
-let usuario=document.getElementById("usuario").value.trim();
-let senha=document.getElementById("senha").value.trim();
-let foto=document.getElementById("preview").src;
+let usuario=usuario.value.trim();
+let senhaInput=senha.value.trim();
+let foto=preview.src;
 
-if(!usuario||!senha||!foto){alert("Preencha tudo");return;}
+if(!usuario||!senhaInput||!foto){alert("Preencha tudo");return;}
 
 let usuarios=JSON.parse(localStorage.getItem("usuarios"))||{};
 
 if(!usuarios[usuario]){
-usuarios[usuario]={senha:senha,foto:foto,favoritos:[]};
+usuarios[usuario]={senha:senhaInput,foto:foto,favoritos:[]};
 }else{
-if(usuarios[usuario].senha!==senha){alert("Senha incorreta");return;}
+if(usuarios[usuario].senha!==senhaInput){alert("Senha incorreta");return;}
 }
 
 localStorage.setItem("usuarios",JSON.stringify(usuarios));
@@ -230,16 +243,26 @@ mostrarHome();
 }
 
 function mostrarHome(){
-document.getElementById("loginPage").classList.add("hidden");
-document.getElementById("homePage").classList.remove("hidden");
-document.getElementById("filmePage").classList.add("hidden");
+loginPage.classList.add("hidden");
+homePage.classList.remove("hidden");
+filmePage.classList.add("hidden");
+}
 
-let usuario=localStorage.getItem("usuarioLogado");
-let usuarios=JSON.parse(localStorage.getItem("usuarios"));
+function abrirFilme(){
+homePage.classList.add("hidden");
+filmePage.classList.remove("hidden");
+}
 
-document.getElementById("fotoPerfil").src=usuarios[usuario].foto;
+function voltarHome(){
+mostrarHome();
+}
 
-carregarLista();
+function abrirPlayer(){
+playerPage.classList.remove("hidden");
+}
+
+function fecharPlayer(){
+playerPage.classList.add("hidden");
 }
 
 function favoritar(){
@@ -257,59 +280,11 @@ alert("Removido da Minha Lista!");
 }
 
 localStorage.setItem("usuarios",JSON.stringify(usuarios));
-
-carregarLista();
-atualizarBotaoFavorito();
-}
-
-function atualizarBotaoFavorito(){
-let usuario=localStorage.getItem("usuarioLogado");
-let usuarios=JSON.parse(localStorage.getItem("usuarios"));
-let botao=document.getElementById("btnFavorito");
-
-if(usuarios[usuario].favoritos.some(f=>f.id===FILME.id)){
-botao.innerText="⭐ Remover da Lista";
-}else{
-botao.innerText="⭐ Favorito";
-}
-}
-
-function carregarLista(){
-let usuario=localStorage.getItem("usuarioLogado");
-let usuarios=JSON.parse(localStorage.getItem("usuarios"));
-let container=document.getElementById("minhaLista");
-container.innerHTML="";
-
-usuarios[usuario].favoritos.forEach(f=>{
-container.innerHTML+=`
-<div class="card" onclick="abrirFilme()">
-<img src="${f.imagem}">
-<div class="card-title">${f.titulo}</div>
-</div>`;
-});
-}
-
-function abrirFilme(){
-document.getElementById("homePage").classList.add("hidden");
-document.getElementById("filmePage").classList.remove("hidden");
-atualizarBotaoFavorito();
-}
-
-function voltarHome(){
-mostrarHome();
 }
 
 function logout(){
 localStorage.removeItem("usuarioLogado");
 location.reload();
-}
-
-function playFilme(){
-window.open("https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview","_blank");
-}
-
-function verTrailer(){
-window.open("https://youtu.be/SaGseDvQ2RI?si=VSn9fv3rE-zfjfgH","_blank");
 }
 
 window.onload=()=>{
