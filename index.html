@@ -161,6 +161,12 @@ margin-bottom:10px;
 </div>
 </header>
 
+<!-- NOVA SEÇÃO ASSISTINDO -->
+<section class="section">
+<h2>Assistindo</h2>
+<div class="movies" id="assistindoLista"></div>
+</section>
+
 <section class="section">
 <h2>Minha Lista</h2>
 <div class="movies" id="minhaLista"></div>
@@ -195,7 +201,7 @@ margin-bottom:10px;
 <button onclick="fecharPlayer()">← Voltar</button>
 SUPERMAN (1941) - T1:E1 O Cientista Louco
 </div>
-<iframe 
+<iframe
 src="https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview"
 allow="autoplay"
 allowfullscreen>
@@ -209,36 +215,34 @@ titulo:"SUPERMAN (1941)",
 imagem:"https://github.com/user-attachments/assets/c176da8e-d1b9-4c14-973d-460abf2b08d0"
 };
 
-/* FOTO PREVIEW */
-document.getElementById("foto").addEventListener("change", e=>{
+/* FOTO */
+foto.addEventListener("change", e=>{
 const file=e.target.files[0];
 if(file){
 const reader=new FileReader();
-reader.onload=ev=>{
-document.getElementById("preview").src=ev.target.result;
-}
+reader.onload=ev=>preview.src=ev.target.result;
 reader.readAsDataURL(file);
 }
 });
 
 /* LOGIN */
 function entrar(){
-let usuario=usuario.value.trim();
-let senhaInput=senha.value.trim();
-let foto=preview.src;
+let user=usuario.value.trim();
+let pass=senha.value.trim();
+let fotoPerfil=preview.src;
 
-if(!usuario||!senhaInput||!foto){alert("Preencha tudo");return;}
+if(!user||!pass||!fotoPerfil){alert("Preencha tudo");return;}
 
 let usuarios=JSON.parse(localStorage.getItem("usuarios"))||{};
 
-if(!usuarios[usuario]){
-usuarios[usuario]={senha:senhaInput,foto:foto,favoritos:[]};
+if(!usuarios[user]){
+usuarios[user]={senha:pass,foto:fotoPerfil,favoritos:[],assistindo:[]};
 }else{
-if(usuarios[usuario].senha!==senhaInput){alert("Senha incorreta");return;}
+if(usuarios[user].senha!==pass){alert("Senha incorreta");return;}
 }
 
 localStorage.setItem("usuarios",JSON.stringify(usuarios));
-localStorage.setItem("usuarioLogado",usuario);
+localStorage.setItem("usuarioLogado",user);
 mostrarHome();
 }
 
@@ -246,51 +250,97 @@ function mostrarHome(){
 loginPage.classList.add("hidden");
 homePage.classList.remove("hidden");
 filmePage.classList.add("hidden");
+carregarAssistindo();
+carregarLista();
 }
 
+/* ABRIR FILME */
 function abrirFilme(){
 homePage.classList.add("hidden");
 filmePage.classList.remove("hidden");
 }
 
-function voltarHome(){
-mostrarHome();
-}
-
+/* PLAY */
 function abrirPlayer(){
+let user=localStorage.getItem("usuarioLogado");
+let usuarios=JSON.parse(localStorage.getItem("usuarios"));
+
+if(!usuarios[user].assistindo) usuarios[user].assistindo=[];
+
+/* REMOVE SE JÁ EXISTIR */
+usuarios[user].assistindo=
+usuarios[user].assistindo.filter(f=>f.id!==FILME.id);
+
+/* ADICIONA NO TOPO */
+usuarios[user].assistindo.unshift(FILME);
+
+localStorage.setItem("usuarios",JSON.stringify(usuarios));
+
 playerPage.classList.remove("hidden");
 }
 
+/* FECHAR PLAYER */
 function fecharPlayer(){
 playerPage.classList.add("hidden");
+mostrarHome();
 }
 
-function favoritar(){
-let usuario=localStorage.getItem("usuarioLogado");
+/* CARREGAR ASSISTINDO */
+function carregarAssistindo(){
+let user=localStorage.getItem("usuarioLogado");
 let usuarios=JSON.parse(localStorage.getItem("usuarios"));
+let container=document.getElementById("assistindoLista");
+container.innerHTML="";
 
-let index=usuarios[usuario].favoritos.findIndex(f=>f.id===FILME.id);
+if(!usuarios[user].assistindo) return;
+
+usuarios[user].assistindo.forEach(f=>{
+container.innerHTML+=`
+<div class="card" onclick="abrirFilme()">
+<img src="${f.imagem}">
+<div class="card-title">${f.titulo}</div>
+</div>`;
+});
+}
+
+/* FAVORITOS */
+function favoritar(){
+let user=localStorage.getItem("usuarioLogado");
+let usuarios=JSON.parse(localStorage.getItem("usuarios"));
+let index=usuarios[user].favoritos.findIndex(f=>f.id===FILME.id);
 
 if(index===-1){
-usuarios[usuario].favoritos.push(FILME);
+usuarios[user].favoritos.push(FILME);
 alert("Adicionado à Minha Lista!");
 }else{
-usuarios[usuario].favoritos.splice(index,1);
+usuarios[user].favoritos.splice(index,1);
 alert("Removido da Minha Lista!");
 }
 
 localStorage.setItem("usuarios",JSON.stringify(usuarios));
+carregarLista();
 }
 
-function logout(){
-localStorage.removeItem("usuarioLogado");
-location.reload();
+function carregarLista(){
+let user=localStorage.getItem("usuarioLogado");
+let usuarios=JSON.parse(localStorage.getItem("usuarios"));
+let container=document.getElementById("minhaLista");
+container.innerHTML="";
+
+usuarios[user].favoritos.forEach(f=>{
+container.innerHTML+=`
+<div class="card" onclick="abrirFilme()">
+<img src="${f.imagem}">
+<div class="card-title">${f.titulo}</div>
+</div>`;
+});
 }
+
+function voltarHome(){mostrarHome();}
+function logout(){localStorage.removeItem("usuarioLogado");location.reload();}
 
 window.onload=()=>{
-if(localStorage.getItem("usuarioLogado")){
-mostrarHome();
-}
+if(localStorage.getItem("usuarioLogado")) mostrarHome();
 }
 </script>
 
