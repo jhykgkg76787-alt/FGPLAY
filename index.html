@@ -10,7 +10,7 @@
             --bg: #0b0b0b;
             --card-bg: #141414;
             --text: #fff;
-            --accent: #00ff88;
+            --accent: #00FA9A;
         }
         body.light { --bg: #f2f2f2; --text: #111; --card-bg: #fff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
@@ -140,19 +140,18 @@
 </div>
 
 <script>
-// Banco de Dados Centralizado
+// ================= BANCO DE DADOS =================
 const CATALOGO = [{
     id: "superman1",
     titulo: "Superman (1941)",
-    ano: "1941",
+    ano: "1941 - 1943",
     temporadas: "Temporada 1",
     classificacao: "L",
     sinopse: "O Homem de Aço luta contra um cientista louco que está destruindo Metrópolis com um canhão de energia.",
     imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/650a438bf0599a727c4510f5b9ef03e33997f01a/IMG_20260223_101640_image_repair_1771852681542.png?raw=true",
     logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/8cdd465434c9026dd4fa822869a03e7d51cbe455/1771363446414_image_repair_1771850698575.png?raw=true",
     episodios: [
-        {titulo: "O Cientista Louco", url: "https://drive.google.com/file/d/1_3ibKA4cETvCy1RfFPgdjgpI3nVQG_G5/preview"},
-        
+        {titulo: "O Cientista Louco", url: "https://www.youtube.com/embed/iNUelg6PrAU"}
     ]
 }];
 
@@ -160,11 +159,12 @@ let userAtivo = null;
 let filmeAtual = null;
 let fotoBase64 = "";
 
-// Gerenciamento de Perfis
+// ================= PERFIS =================
 function renderPerfis() {
     const users = JSON.parse(localStorage.getItem("fg_users")) || {};
     const container = document.getElementById("listaPerfis");
     container.innerHTML = "";
+
     Object.keys(users).forEach(nome => {
         container.innerHTML += `
             <div class="profile-item" onclick="logar('${nome}')">
@@ -173,57 +173,84 @@ function renderPerfis() {
                 <p style="color:white;margin-top:10px">${nome}</p>
             </div>`;
     });
-    container.innerHTML += `<div class="profile-item" onclick="document.getElementById('createModal').classList.remove('hidden')">
-        <div class="profile-avatar" style="display:flex;justify-content:center;align-items:center;font-size:3rem;color:#444;border:2px dashed #333">+</div>
-        <p style="color:white;margin-top:10px">Novo Perfil</p>
-    </div>`;
+
+    container.innerHTML += `
+        <div class="profile-item" onclick="document.getElementById('createModal').classList.remove('hidden')">
+            <div class="profile-avatar" style="display:flex;justify-content:center;align-items:center;font-size:3rem;color:#444;border:2px dashed #333">+</div>
+            <p style="color:white;margin-top:10px">Novo Perfil</p>
+        </div>`;
 }
 
 function salvarPerfil() {
     const nome = document.getElementById("newName").value.trim();
     if(!nome) return alert("Digite um nome!");
+
     let users = JSON.parse(localStorage.getItem("fg_users")) || {};
-    users[nome] = { foto: fotoBase64, favoritos: [], assistindo: [] };
+
+    if(users[nome]) return alert("Esse perfil já existe!");
+
+    users[nome] = { foto: fotoBase64 || "", favoritos: [], assistindo: [] };
     localStorage.setItem("fg_users", JSON.stringify(users));
+
+    document.getElementById("newName").value = "";
+    fotoBase64 = "";
     fecharModal();
     renderPerfis();
 }
 
 function logar(nome) {
+    const users = JSON.parse(localStorage.getItem("fg_users")) || {};
+    if(!users[nome]) return;
+
     userAtivo = nome;
     localStorage.setItem("fg_sessao", nome);
+
     document.getElementById("profilePage").classList.add("hidden");
     document.getElementById("site").classList.remove("hidden");
-    const users = JSON.parse(localStorage.getItem("fg_users"));
+
     document.getElementById("userImg").src = users[nome].foto || "https://via.placeholder.com/40";
     renderHome();
 }
 
-// Navegação e Catálogo
+// ================= HOME =================
 function renderHome() {
-    const users = JSON.parse(localStorage.getItem("fg_users"));
+    const users = JSON.parse(localStorage.getItem("fg_users")) || {};
     const dados = users[userAtivo];
-    
+    if(!dados) return;
+
     document.getElementById("catalogo").innerHTML = CATALOGO.map(f => `
         <div class="card" onclick="abrirDetalhes('${f.id}')">
             <img src="${f.imagem}">
             <div class="card-title">${f.titulo}</div>
         </div>`).join('');
-    
+
     const favs = dados.favoritos || [];
-    document.getElementById("listaFavoritos").innerHTML = favs.map(f => `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`).join('');
+    document.getElementById("listaFavoritos").innerHTML =
+        favs.map(id => {
+            const f = CATALOGO.find(x => x.id === id);
+            if(!f) return "";
+            return `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`;
+        }).join('');
     document.getElementById("tLista").classList.toggle("hidden", favs.length === 0);
 
     const hist = dados.assistindo || [];
-    document.getElementById("listaAssistindo").innerHTML = hist.map(f => `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`).join('');
+    document.getElementById("listaAssistindo").innerHTML =
+        hist.map(id => {
+            const f = CATALOGO.find(x => x.id === id);
+            if(!f) return "";
+            return `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`;
+        }).join('');
     document.getElementById("tAssistindo").classList.toggle("hidden", hist.length === 0);
 }
 
+// ================= DETALHES =================
 function abrirDetalhes(id) {
     filmeAtual = CATALOGO.find(f => f.id === id);
+    if(!filmeAtual) return;
+
     document.getElementById("homeContent").classList.add("hidden");
     document.getElementById("detalhesPage").classList.remove("hidden");
-    
+
     document.getElementById("heroBg").style.backgroundImage = `url(${filmeAtual.imagem})`;
     document.getElementById("heroLogo").src = filmeAtual.logo;
     document.getElementById("detAno").innerText = filmeAtual.ano;
@@ -231,28 +258,33 @@ function abrirDetalhes(id) {
     document.getElementById("detRating").innerText = filmeAtual.classificacao;
     document.getElementById("detSinopse").innerText = filmeAtual.sinopse;
 
-    document.getElementById("btnPlayTop").onclick = () => playEp(filmeAtual.episodios[0].url);
+    document.getElementById("btnPlayTop").onclick =
+        () => playEp(filmeAtual.episodios[0].url);
 
-    document.getElementById("listaEpisodios").innerHTML = filmeAtual.episodios.map((ep, i) => {
-        let n = (i+1).toString().padStart(2, "0");
-        return `<div class="episode-item ${i===0?'ep-highlight':''}" onclick="playEp('${ep.url}')">
-            <span>EP${n} - ${ep.titulo}</span>
-            <strong>▶</strong>
-        </div>`;
-    }).join('');
-    
+    document.getElementById("listaEpisodios").innerHTML =
+        filmeAtual.episodios.map((ep,i) => {
+            let n = (i+1).toString().padStart(2,"0");
+            return `<div class="episode-item ${i===0?'ep-highlight':''}" onclick="playEp('${ep.url}')">
+                <span>EP${n} - ${ep.titulo}</span>
+                <strong>▶</strong>
+            </div>`;
+        }).join('');
+
     updateFavButton();
     window.scrollTo(0,0);
 }
 
-// Funções do Player
+// ================= PLAYER =================
 function playEp(url) {
-    // Adiciona ao "Continuar Assistindo"
+    if(!filmeAtual) return;
+
     const users = JSON.parse(localStorage.getItem("fg_users"));
     let hist = users[userAtivo].assistindo || [];
-    hist = hist.filter(f => f.id !== filmeAtual.id);
-    hist.unshift(filmeAtual);
-    users[userAtivo].assistindo = hist.slice(0, 10);
+
+    hist = hist.filter(id => id !== filmeAtual.id);
+    hist.unshift(filmeAtual.id);
+
+    users[userAtivo].assistindo = hist.slice(0,10);
     localStorage.setItem("fg_users", JSON.stringify(users));
 
     document.getElementById("videoPlayer").src = url;
@@ -270,13 +302,16 @@ function voltarHome() {
     renderHome();
 }
 
-// Favoritos e Busca
+// ================= FAVORITOS =================
 function toggleFav() {
     const users = JSON.parse(localStorage.getItem("fg_users"));
     let favs = users[userAtivo].favoritos || [];
-    const index = favs.findIndex(f => f.id === filmeAtual.id);
-    if(index > -1) favs.splice(index, 1);
-    else favs.push(filmeAtual);
+
+    if(favs.includes(filmeAtual.id))
+        favs = favs.filter(id => id !== filmeAtual.id);
+    else
+        favs.push(filmeAtual.id);
+
     users[userAtivo].favoritos = favs;
     localStorage.setItem("fg_users", JSON.stringify(users));
     updateFavButton();
@@ -285,26 +320,52 @@ function toggleFav() {
 function updateFavButton() {
     const users = JSON.parse(localStorage.getItem("fg_users"));
     const favs = users[userAtivo].favoritos || [];
-    const exists = favs.find(f => f.id === filmeAtual.id);
-    document.getElementById("btnFav").innerText = exists ? "✓ Na Minha Lista" : "+ Minha Lista";
+    document.getElementById("btnFav").innerText =
+        favs.includes(filmeAtual.id)
+        ? "✓ Na Minha Lista"
+        : "+ Minha Lista";
 }
 
+// ================= BUSCA =================
 function filtrar() {
     const termo = document.getElementById("inputBusca").value.toLowerCase();
     const section = document.getElementById("sectionBusca");
+
     if(termo.length > 0) {
         section.classList.remove("hidden");
-        const filtrados = CATALOGO.filter(f => f.titulo.toLowerCase().includes(termo));
-        document.getElementById("resBusca").innerHTML = filtrados.map(f => `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`).join('');
-    } else section.classList.add("hidden");
+        const filtrados = CATALOGO.filter(f =>
+            f.titulo.toLowerCase().includes(termo)
+        );
+        document.getElementById("resBusca").innerHTML =
+            filtrados.map(f =>
+                `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`
+            ).join('');
+    } else {
+        section.classList.add("hidden");
+    }
 }
 
-// Sistema
-function fecharModal() { document.getElementById("createModal").classList.add("hidden"); }
-function logout() { localStorage.removeItem("fg_sessao"); location.reload(); }
-function deletarUser(n) { if(confirm("Apagar perfil?")) { let u = JSON.parse(localStorage.getItem("fg_users")); delete u[n]; localStorage.setItem("fg_users", JSON.stringify(u)); renderPerfis(); } }
+// ================= SISTEMA =================
+function fecharModal() {
+    document.getElementById("createModal").classList.add("hidden");
+}
+
+function logout() {
+    localStorage.removeItem("fg_sessao");
+    location.reload();
+}
+
+function deletarUser(n) {
+    if(confirm("Apagar perfil?")) {
+        let u = JSON.parse(localStorage.getItem("fg_users")) || {};
+        delete u[n];
+        localStorage.setItem("fg_users", JSON.stringify(u));
+        renderPerfis();
+    }
+}
 
 document.getElementById("newFile").addEventListener("change", function() {
+    if(!this.files[0]) return;
     const reader = new FileReader();
     reader.onload = e => fotoBase64 = e.target.result;
     reader.readAsDataURL(this.files[0]);
@@ -312,7 +373,8 @@ document.getElementById("newFile").addEventListener("change", function() {
 
 window.onload = () => {
     const sessao = localStorage.getItem("fg_sessao");
-    if(sessao) logar(sessao); else renderPerfis();
+    if(sessao) logar(sessao);
+    else renderPerfis();
 };
 </script>
 </body>
