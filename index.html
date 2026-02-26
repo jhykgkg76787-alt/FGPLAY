@@ -1,401 +1,342 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FG PLAY</title>
-    <style>
-        :root {
-            --primary: #00b3ff;
-            --bg: #0b0b0b;
-            --card-bg: #141414;
-            --text: #fff;
-            --accent: #00FA9A;
-        }
-        body.light { --bg: #f2f2f2; --text: #111; --card-bg: #fff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; transition: .3s; }
-        .hidden { display: none !important; }
-        button { cursor: pointer; border: none; transition: .3s; outline: none; }
-
-        /* PERFIS */
-        .profile-selector { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; position: fixed; inset: 0; z-index: 5000; }
-        .profiles-list { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
-        .profile-item { text-align: center; width: 140px; cursor: pointer; position: relative; }
-        .profile-avatar { width: 130px; height: 130px; border-radius: 12px; object-fit: cover; background: #222; border: 3px solid transparent; }
-        .profile-item:hover .profile-avatar { border-color: var(--primary); transform: scale(1.05); }
-        .delete-btn { position: absolute; top: -10px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 25px; height: 25px; font-size: 12px; z-index: 10; }
-
-        /* HEADER */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: rgba(0,0,0,.95); position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(10px); }
-        .logo { color: var(--primary); font-weight: 900; font-size: 1.6rem; cursor: pointer; }
-        .search-box input { padding: 10px 20px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: white; width: 250px; }
-
-        /* HOME */
-        .section { padding: 100px 5% 0; }
-        .movies { display: flex; gap: 15px; overflow-x: auto; padding: 20px 0; scroll-behavior: smooth; }
-        .card { min-width: 180px; height: 260px; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer; background: var(--card-bg); transition: .3s; box-shadow: 0 4px 15px rgba(0,0,0,.5); }
-        .card:hover { transform: scale(1.08); z-index: 100; }
-        .card img { width: 100%; height: 100%; object-fit: cover; }
-        .card-title { position: absolute; bottom: 0; width: 100%; padding: 10px; background: linear-gradient(transparent, #000); color: #fff; font-size: .85rem; text-align: center; }
-
-        /* DETALHES */
-        .hero { min-height: 80vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; padding: 0 5%; }
-        .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 15%, transparent 95%), linear-gradient(to right, var(--bg) 25%, transparent); z-index: 1; }
-        .hero-content { position: relative; z-index: 2; max-width: 700px; padding-top: 60px; }
-        #heroLogo { max-width: 320px; margin-bottom: 20px; display: block; }
-        .meta { display: flex; gap: 15px; margin-bottom: 15px; font-weight: bold; font-size: 0.9rem; color: var(--accent); }
-        .description { font-size: 1.1rem; line-height: 1.6; color: #ccc; margin-bottom: 25px; }
-
-        /* EPISÓDIOS */
-        .episode-item { background: #1a1a1a; padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; cursor: pointer; border: 1px solid #333; }
-        .episode-item:hover { background: #252525; border-color: var(--primary); }
-        .ep-highlight { background: linear-gradient(90deg, var(--primary), #0066ff); font-weight: bold; color: white; }
-
-        /* PLAYER */
-        .playerPage { position: fixed; inset: 0; background: #000; z-index: 9000; }
-        .playerPage iframe { width: 100%; height: 100%; border: none; }
-        .close-player { position: absolute; top: 25px; left: 25px; background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; z-index: 9001; }
-
-        /* MODAL */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,.9); display: flex; justify-content: center; align-items: center; z-index: 6000; }
-        .modal-box { background: #181818; padding: 30px; border-radius: 15px; width: 340px; text-align: center; }
-        .modal-box input { width: 100%; padding: 12px; margin: 12px 0; border-radius: 8px; border: none; background: #222; color: white; }
-        .btn-main { background: var(--primary); color: white; padding: 12px 25px; border-radius: 6px; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<div id="profilePage" class="profile-selector">
-    <h1 style="color:white;margin-bottom:40px; font-size: 2.5rem;">Quem Está Assistindo?</h1>
-    <div class="profiles-list" id="listaPerfis"></div>
-</div>
-
-<div id="createModal" class="modal hidden">
-    <div class="modal-box">
-        <h2 style="color:white; margin-bottom: 10px;">Novo Perfil</h2>
-        <input type="text" id="newName" placeholder="Nome do perfil">
-        <input type="file" id="newFile" accept="image/*">
-        <button class="btn-main" onclick="salvarPerfil()" style="width:100%">CRIAR</button>
-        <button onclick="fecharModal()" style="background:none;color:gray;margin-top:15px; display: block; width: 100%;">Cancelar</button>
-    </div>
-</div>
-
-<div id="site" class="hidden">
-    <header>
-        <div class="logo" onclick="voltarHome()">FG PLAY</div>
-        <div class="search-box">
-            <input type="text" id="inputBusca" placeholder="O que você quer assistir?" oninput="filtrar()">
-        </div>
-        <div style="display:flex;align-items:center;gap:15px;">
-            <button onclick="document.body.classList.toggle('light')" style="background:none;font-size:1.4rem;">🌓</button>
-            <img id="userImg" style="width:40px;height:40px;border-radius:10px;border:2px solid var(--primary);cursor:pointer" onclick="logout()">
-        </div>
-    </header>
-
-    <main id="homeContent">
-        <section id="sectionBusca" class="section hidden">
-            <h2>Resultados da Busca</h2>
-            <div class="movies" id="resBusca"></div>
-        </section>
-
-        <section class="section">
-            <h2 id="tAssistindo" class="hidden">Você Assistiu</h2>
-            <div class="movies" id="listaAssistindo"></div>
-        </section>
-
-        <section class="section">
-            <h2 id="tLista" class="hidden">Minha Lista</h2>
-            <div class="movies" id="listaFavoritos"></div>
-        </section>
-
-        <section class="section">
-            <h2>Séries em Destaque</h2>
-            <div class="movies" id="catalogo"></div>
-        </section>
-    </main>
-
-    <div id="detalhesPage" class="hidden">
-        <section class="hero" id="heroBg">
-            <div class="hero-content">
-                <img id="heroLogo" src="">
-                <div class="meta">
-                    <span id="detAno"></span> • <span id="detTemporadas"></span> • <span id="detRating"></span>
-                </div>
-                <p class="description" id="detSinopse"></p>
-                <div style="display:flex; gap:15px; margin-bottom: 30px;">
-                    <button id="btnPlayTop" class="btn-main" style="padding: 15px 40px; font-size: 1.1rem;">▶ ASSISTIR</button>
-                    <button id="btnFav" class="btn-main" style="background: rgba(255,255,255,0.1);" onclick="toggleFav()">+ Minha Lista</button>
-                </div>
-                <button onclick="voltarHome()" style="background:none; color:var(--primary); font-weight:bold;">← VOLTAR</button>
-            </div>
-        </section>
-        <div style="padding:40px 5%;" id="listaEpisodios"></div>
-    </div>
-</div>
-
-<div id="playerPage" class="playerPage hidden">
-    <button class="close-player" onclick="fecharPlayer()">✕ Fechar</button>
-    <iframe id="videoPlayer" allow="autoplay; fullscreen"></iframe>
-</div>
-
-<script>
-// ================= CATALOGO UNIFICADO =================
-// Ajustei para que ambos tenham a mesma estrutura (imagem, logo, episodios, etc)
-const CATALOGO = [
-    {
-        id: "superman",
-        titulo: "Superman (1941)",
-        ano: "1941 - 1943",
-        temporadas: "Temporada 1",
-        classificacao: "L",
-        sinopse: "O Homem De Aço Luta Contra Um Cientista Louco Que Está Destruindo Metrópolis Com Um Canhão De Energia.",
-        imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",
-        logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/8cdd465434c9026dd4fa822869a03e7d51cbe455/1771363446414_image_repair_1771850698575.png?raw=true",
-        episodios: [
-            { titulo: "O Cientista Louco", url: "https://www.youtube.com/embed/iNUelg6PrAU" }
-        ]
-    },
-    {
-        id: "AsViagensdeGulliverfilme",
-        titulo: "As Viagens De Gulliver",
-        ano: "1939",
-        temporadas: "Filme",
-        classificacao: "L",
-        sinopse: "Gulliver naufraga em Lilliput, uma ilha habitada por pessoas minúsculas.",
-        imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/8cdd465434c9026dd4fa822869a03e7d51cbe455/1771363446414_image_repair_1771850698575.png?raw=true",
-        logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",
-        episodios: [
-            { titulo: "Filme Completo", url: "https://www.youtube.com/embed/rgAH3aw5Da8" }
-        ]
-    }
-];
-
-let userAtivo = null;
-let filmeAtual = null;
-let fotoBase64 = "";
-
-// ================= PERFIS =================
-function renderPerfis() {
-    const users = JSON.parse(localStorage.getItem("fg_users")) || {};
-    const container = document.getElementById("listaPerfis");
-    if(!container) return;
-    container.innerHTML = "";
-
-    Object.keys(users).forEach(nome => {
-        container.innerHTML += `
-            <div class="profile-item" onclick="logar('${nome}')">
-                <button class="delete-btn" onclick="event.stopPropagation();deletarUser('${nome}')">✕</button>
-                <img src="${users[nome].foto || 'https://via.placeholder.com/130'}" class="profile-avatar">
-                <p style="color:white;margin-top:10px">${nome}</p>
-            </div>`;
-    });
-
-    container.innerHTML += `
-        <div class="profile-item" onclick="document.getElementById('createModal').classList.remove('hidden')">
-            <div class="profile-avatar" style="display:flex;justify-content:center;align-items:center;font-size:3rem;color:#444;border:2px dashed #333">+</div>
-            <p style="color:white;margin-top:10px">Novo Perfil</p>
-        </div>`;
-}
-
-function salvarPerfil() {
-    const nome = document.getElementById("newName").value.trim();
-    if(!nome) return alert("Digite um nome!");
-
-    let users = JSON.parse(localStorage.getItem("fg_users")) || {};
-    if(users[nome]) return alert("Esse perfil já existe!");
-
-    users[nome] = { foto: fotoBase64 || "", favoritos: [], assistindo: [] };
-    localStorage.setItem("fg_users", JSON.stringify(users));
-
-    document.getElementById("newName").value = "";
-    fotoBase64 = "";
-    fecharModal();
-    renderPerfis();
-}
-
-function logar(nome) {
-    const users = JSON.parse(localStorage.getItem("fg_users")) || {};
-    if(!users[nome]) return;
-
-    userAtivo = nome;
-    localStorage.setItem("fg_sessao", nome);
-
-    document.getElementById("profilePage").classList.add("hidden");
-    document.getElementById("site").classList.remove("hidden");
-
-    document.getElementById("userImg").src = users[nome].foto || "https://via.placeholder.com/40";
-    renderHome();
-}
-
-// ================= HOME =================
-function renderHome() {
-    const users = JSON.parse(localStorage.getItem("fg_users")) || {};
-    const dados = users[userAtivo];
-    if(!dados) return;
-
-    // Render Geral
-    document.getElementById("catalogo").innerHTML = CATALOGO.map(f => `
-        <div class="card" onclick="abrirDetalhes('${f.id}')">
-            <img src="${f.imagem}">
-            <div class="card-title">${f.titulo}</div>
-        </div>`).join('');
-
-    // Favoritos
-    const favs = dados.favoritos || [];
-    const listaFav = document.getElementById("listaFavoritos");
-    listaFav.innerHTML = favs.map(id => {
-            const f = CATALOGO.find(x => x.id === id);
-            return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>` : "";
-        }).join('');
-    document.getElementById("tLista").classList.toggle("hidden", favs.length === 0);
-
-    // Histórico
-    const hist = dados.assistindo || [];
-    const listaHist = document.getElementById("listaAssistindo");
-    listaHist.innerHTML = hist.map(id => {
-            const f = CATALOGO.find(x => x.id === id);
-            return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>` : "";
-        }).join('');
-    document.getElementById("tAssistindo").classList.toggle("hidden", hist.length === 0);
-}
-
-// ================= DETALHES =================
-function abrirDetalhes(id) {
-    filmeAtual = CATALOGO.find(f => f.id === id);
-    if(!filmeAtual) return;
-
-    document.getElementById("homeContent").classList.add("hidden");
-    document.getElementById("detalhesPage").classList.remove("hidden");
-
-    document.getElementById("heroBg").style.backgroundImage = `url(${filmeAtual.imagem})`;
-    document.getElementById("heroLogo").src = filmeAtual.logo;
-    document.getElementById("detAno").innerText = filmeAtual.ano;
-    document.getElementById("detTemporadas").innerText = filmeAtual.temporadas;
-    document.getElementById("detRating").innerText = filmeAtual.classificacao;
-    document.getElementById("detSinopse").innerText = filmeAtual.sinopse;
-
-    // Configura o botão play principal
-    document.getElementById("btnPlayTop").onclick = () => playEp(filmeAtual.episodios[0].url);
-
-    // Lista de episódios
-    document.getElementById("listaEpisodios").innerHTML = filmeAtual.episodios.map((ep, i) => {
-            let n = (i + 1).toString().padStart(2, "0");
-            return `<div class="episode-item" onclick="playEp('${ep.url}')">
-                <span>EP${n} - ${ep.titulo}</span>
-                <strong>▶</strong>
-            </div>`;
-        }).join('');
-
-    updateFavButton();
-    window.scrollTo(0, 0);
-}
-
-// ================= PLAYER =================
-function playEp(url) {
-    if(!filmeAtual || !userAtivo) return;
-
-    let users = JSON.parse(localStorage.getItem("fg_users"));
-    let hist = users[userAtivo].assistindo || [];
-
-    // Remove se já existir e coloca no topo
-    hist = hist.filter(id => id !== filmeAtual.id);
-    hist.unshift(filmeAtual.id);
-
-    users[userAtivo].assistindo = hist.slice(0, 10);
-    localStorage.setItem("fg_users", JSON.stringify(users));
-
-    document.getElementById("videoPlayer").src = url;
-    document.getElementById("playerPage").classList.remove("hidden");
-}
-
-function fecharPlayer() {
-    document.getElementById("playerPage").classList.add("hidden");
-    document.getElementById("videoPlayer").src = "";
-}
-
-function voltarHome() {
-    document.getElementById("homeContent").classList.remove("hidden");
-    document.getElementById("detalhesPage").classList.add("hidden");
-    renderHome();
-}
-
-// ================= FAVORITOS =================
-function toggleFav() {
-    let users = JSON.parse(localStorage.getItem("fg_users"));
-    let favs = users[userAtivo].favoritos || [];
-
-    if(favs.includes(filmeAtual.id)) {
-        favs = favs.filter(id => id !== filmeAtual.id);
-    } else {
-        favs.push(filmeAtual.id);
-    }
-
-    users[userAtivo].favoritos = favs;
-    localStorage.setItem("fg_users", JSON.stringify(users));
-    updateFavButton();
-}
-
-function updateFavButton() {
-    const users = JSON.parse(localStorage.getItem("fg_users"));
-    const favs = users[userAtivo].favoritos || [];
-    const btn = document.getElementById("btnFav");
-    if(btn) {
-        btn.innerText = favs.includes(filmeAtual.id) ? "✓ Na Minha Lista" : "+ Minha Lista";
-    }
-}
-
-// ================= BUSCA =================
-function filtrar() {
-    const termo = document.getElementById("inputBusca").value.toLowerCase();
-    const section = document.getElementById("sectionBusca");
-
-    if(termo.length > 0) {
-        section.classList.remove("hidden");
-        const filtrados = CATALOGO.filter(f => f.titulo.toLowerCase().includes(termo));
-        document.getElementById("resBusca").innerHTML = filtrados.map(f =>
-                `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`
-            ).join('');
-    } else {
-        section.classList.add("hidden");
-    }
-}
-
-// ================= SISTEMA =================
-function fecharModal() {
-    document.getElementById("createModal").classList.add("hidden");
-}
-
-function logout() {
-    localStorage.removeItem("fg_sessao");
-    location.reload();
-}
-
-function deletarUser(n) {
-    if(confirm("Apagar perfil?")) {
-        let u = JSON.parse(localStorage.getItem("fg_users")) || {};
-        delete u[n];
-        localStorage.setItem("fg_users", JSON.stringify(u));
-        renderPerfis();
-    }
-}
-
-// Listener para imagem de perfil
-const fileInput = document.getElementById("newFile");
-if(fileInput) {
-    fileInput.addEventListener("change", function() {
-        if(!this.files[0]) return;
-        const reader = new FileReader();
-        reader.onload = e => fotoBase64 = e.target.result;
-        reader.readAsDataURL(this.files[0]);
-    });
-}
-
-window.onload = () => {
-    const sessao = localStorage.getItem("fg_sessao");
-    if(sessao) logar(sessao);
-    else renderPerfis();
-};
-</script>
-</body>
+<!DOCTYPE html>  
+<html lang="pt-br">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>FG PLAY</title>  
+    <style>  
+        :root {  
+            --primary: #00b3ff;  
+            --bg: #0b0b0b;  
+            --card-bg: #141414;  
+            --text: #fff;  
+            --accent: #00FA9A;  
+        }  
+        body.light { --bg: #f2f2f2; --text: #111; --card-bg: #fff; }  
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }  
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; transition: .3s; }  
+        .hidden { display: none !important; }  
+        button { cursor: pointer; border: none; transition: .3s; outline: none; }  
+  
+        /* PERFIS */  
+        .profile-selector { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; position: fixed; inset: 0; z-index: 5000; }  
+        .profiles-list { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }  
+        .profile-item { text-align: center; width: 140px; cursor: pointer; position: relative; }  
+        .profile-avatar { width: 130px; height: 130px; border-radius: 12px; object-fit: cover; background: #222; border: 3px solid transparent; }  
+        .profile-item:hover .profile-avatar { border-color: var(--primary); transform: scale(1.05); }  
+        .delete-btn { position: absolute; top: -10px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 25px; height: 25px; font-size: 12px; z-index: 10; }  
+  
+        /* HEADER */  
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: rgba(0,0,0,.95); position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(10px); }  
+        .logo { color: var(--primary); font-weight: 900; font-size: 1.6rem; cursor: pointer; }  
+        .search-box input { padding: 10px 20px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: white; width: 250px; }  
+  
+        /* HOME */  
+        .section { padding: 100px 5% 0; }  
+        .movies { display: flex; gap: 15px; overflow-x: auto; padding: 20px 0; scroll-behavior: smooth; }  
+        .card { min-width: 180px; height: 260px; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer; background: var(--card-bg); transition: .3s; box-shadow: 0 4px 15px rgba(0,0,0,.5); }  
+        .card:hover { transform: scale(1.08); z-index: 100; }  
+        .card img { width: 100%; height: 100%; object-fit: cover; }  
+        .card-title { position: absolute; bottom: 0; width: 100%; padding: 10px; background: linear-gradient(transparent, #000); color: #fff; font-size: .85rem; text-align: center; }  
+  
+        /* DETALHES */  
+        .hero { min-height: 80vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; padding: 0 5%; }  
+        .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 15%, transparent 95%), linear-gradient(to right, var(--bg) 25%, transparent); z-index: 1; }  
+        .hero-content { position: relative; z-index: 2; max-width: 700px; padding-top: 60px; }  
+        #heroLogo { max-width: 320px; margin-bottom: 20px; display: block; }  
+        .meta { display: flex; gap: 15px; margin-bottom: 15px; font-weight: bold; font-size: 0.9rem; color: var(--accent); }  
+        .description { font-size: 1.1rem; line-height: 1.6; color: #ccc; margin-bottom: 25px; }  
+  
+        /* EPISÓDIOS */  
+        .episode-item { background: #1a1a1a; padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; cursor: pointer; border: 1px solid #333; }  
+        .episode-item:hover { background: #252525; border-color: var(--primary); }  
+  
+        /* PLAYER */  
+        .playerPage { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; align-items: center; justify-content: center; }  
+        .playerPage video { width: 100%; height: 100%; outline: none; }  
+        .close-player { position: absolute; top: 25px; left: 25px; background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; z-index: 9001; }  
+  
+        /* MODAL */  
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,.9); display: flex; justify-content: center; align-items: center; z-index: 6000; }  
+        .modal-box { background: #181818; padding: 30px; border-radius: 15px; width: 340px; text-align: center; }  
+        .modal-box input { width: 100%; padding: 12px; margin: 12px 0; border-radius: 8px; border: none; background: #222; color: white; }  
+        .btn-main { background: var(--primary); color: white; padding: 12px 25px; border-radius: 6px; font-weight: bold; }  
+    </style>  
+</head>  
+<body>  
+  
+<div id="profilePage" class="profile-selector">  
+    <h1 style="color:white;margin-bottom:40px; font-size: 2.5rem;">Quem Está Assistindo?</h1>  
+    <div class="profiles-list" id="listaPerfis"></div>  
+</div>  
+  
+<div id="createModal" class="modal hidden">  
+    <div class="modal-box">  
+        <h2 style="color:white; margin-bottom: 10px;">Novo Perfil</h2>  
+        <input type="text" id="newName" placeholder="Nome do perfil">  
+        <input type="file" id="newFile" accept="image/*">  
+        <button class="btn-main" onclick="salvarPerfil()" style="width:100%">CRIAR</button>  
+        <button onclick="fecharModal()" style="background:none;color:gray;margin-top:15px; display: block; width: 100%;">Cancelar</button>  
+    </div>  
+</div>  
+  
+<div id="site" class="hidden">  
+    <header>  
+        <div class="logo" onclick="voltarHome()">FG PLAY</div>  
+        <div class="search-box">  
+            <input type="text" id="inputBusca" placeholder="O que você quer assistir?" oninput="filtrar()">  
+        </div>  
+        <div style="display:flex;align-items:center;gap:15px;">  
+            <button onclick="document.body.classList.toggle('light')" style="background:none;font-size:1.4rem;">🌓</button>  
+            <img id="userImg" style="width:40px;height:40px;border-radius:10px;border:2px solid var(--primary);cursor:pointer" onclick="logout()">  
+        </div>  
+    </header>  
+  
+    <main id="homeContent">  
+        <section id="sectionBusca" class="section hidden">  
+            <h2>Resultados da Busca</h2>  
+            <div class="movies" id="resBusca"></div>  
+        </section>  
+  
+        <section class="section">  
+            <h2 id="tAssistindo" class="hidden">Continue Assistindo</h2>  
+            <div class="movies" id="listaAssistindo"></div>  
+        </section>  
+  
+        <section class="section" style="padding-top: 20px;">  
+            <h2 id="tLista" class="hidden">Minha Lista</h2>  
+            <div class="movies" id="listaFavoritos"></div>  
+        </section>  
+  
+        <section class="section" style="padding-top: 20px;">  
+            <h2>Séries em Destaque</h2>  
+            <div class="movies" id="catalogo"></div>  
+        </section>  
+    </main>  
+  
+    <div id="detalhesPage" class="hidden">  
+        <section class="hero" id="heroBg">  
+            <div class="hero-content">  
+                <img id="heroLogo" src="">  
+                <div class="meta">  
+                    <span id="detAno"></span> • <span id="detTemporadas"></span> • <span id="detRating"></span>  
+                </div>  
+                <p class="description" id="detSinopse"></p>  
+                <div style="display:flex; gap:15px; margin-bottom: 30px;">  
+                    <button id="btnPlayTop" class="btn-main" style="padding: 15px 40px; font-size: 1.1rem;">▶ ASSISTIR</button>  
+                    <button id="btnFav" class="btn-main" style="background: rgba(255,255,255,0.1);" onclick="toggleFav()">+ Minha Lista</button>  
+                </div>  
+                <button onclick="voltarHome()" style="background:none; color:var(--primary); font-weight:bold;">← VOLTAR</button>  
+            </div>  
+        </section>  
+        <div style="padding:40px 5%;" id="listaEpisodios"></div>  
+    </div>  
+</div>  
+  
+<div id="playerPage" class="playerPage hidden">  
+    <button class="close-player" onclick="fecharPlayer()">✕ Fechar</button>  
+    <video id="videoPlayer" controls autoplay></video>  
+</div>  
+  
+<script>  
+const CATALOGO = [  
+    {  
+        id: "superman",  
+        titulo: "Superman (1941)",  
+        ano: "1941 - 1943",  
+        temporadas: "Temporada 1",  
+        classificacao: "L",  
+        sinopse: "O Homem De Aço Luta Contra Um Cientista Louco Que Está Destruindo Metrópolis Com Um Canhão De Energia.",  
+        imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",  
+        logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/8cdd465434c9026dd4fa822869a03e7d51cbe455/1771363446414_image_repair_1771850698575.png?raw=true",  
+        episodios: [  
+            { titulo: "O Cientista Louco", url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/Video-1%20(1).MP4" }  
+        ]  
+    }  
+];  
+  
+let userAtivo = null;  
+let filmeAtual = null;  
+let fotoBase64 = "";  
+let saveInterval = null;  
+  
+// ================= PERFIS =================  
+function renderPerfis() {  
+    const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
+    const container = document.getElementById("listaPerfis");  
+    if(!container) return;  
+    container.innerHTML = "";  
+  
+    Object.keys(users).forEach(nome => {  
+        container.innerHTML += `  
+            <div class="profile-item" onclick="logar('${nome}')">  
+                <button class="delete-btn" onclick="event.stopPropagation();deletarUser('${nome}')">✕</button>  
+                <img src="${users[nome].foto || 'https://via.placeholder.com/130'}" class="profile-avatar">  
+                <p style="color:white;margin-top:10px">${nome}</p>  
+            </div>`;  
+    });  
+  
+    container.innerHTML += `  
+        <div class="profile-item" onclick="document.getElementById('createModal').classList.remove('hidden')">  
+            <div class="profile-avatar" style="display:flex;justify-content:center;align-items:center;font-size:3rem;color:#444;border:2px dashed #333">+</div>  
+            <p style="color:white;margin-top:10px">Novo Perfil</p>  
+        </div>`;  
+}  
+  
+function salvarPerfil() {  
+    const nome = document.getElementById("newName").value.trim();  
+    if(!nome) return alert("Digite um nome!");  
+    let users = JSON.parse(localStorage.getItem("fg_users")) || {};  
+    if(users[nome]) return alert("Esse perfil já existe!");  
+    users[nome] = { foto: fotoBase64 || "", favoritos: [], assistindo: [] };  
+    localStorage.setItem("fg_users", JSON.stringify(users));  
+    fecharModal(); renderPerfis();  
+}  
+  
+function logar(nome) {  
+    userAtivo = nome;  
+    localStorage.setItem("fg_sessao", nome);  
+    document.getElementById("profilePage").classList.add("hidden");  
+    document.getElementById("site").classList.remove("hidden");  
+    const users = JSON.parse(localStorage.getItem("fg_users"));  
+    document.getElementById("userImg").src = users[nome].foto || "https://via.placeholder.com/40";  
+    renderHome();  
+}  
+  
+// ================= HOME =================  
+function renderHome() {  
+    const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
+    const dados = users[userAtivo];  
+    if(!dados) return;  
+  
+    document.getElementById("catalogo").innerHTML = CATALOGO.map(f => `  
+        <div class="card" onclick="abrirDetalhes('${f.id}')">  
+            <img src="${f.imagem}">  
+            <div class="card-title">${f.titulo}</div>  
+        </div>`).join('');  
+  
+    const favs = dados.favoritos || [];  
+    const listaFav = document.getElementById("listaFavoritos");  
+    listaFav.innerHTML = favs.map(id => {  
+        const f = CATALOGO.find(x => x.id === id);  
+        return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>` : "";  
+    }).join('');  
+    document.getElementById("tLista").classList.toggle("hidden", favs.length === 0);  
+  
+    // Histórico de progresso (Continuar Assistindo)  
+    const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
+    const listaHist = document.getElementById("listaAssistindo");  
+    const idsAssistindo = Object.keys(progresso);  
+    
+    listaHist.innerHTML = idsAssistindo.reverse().map(id => {  
+        const f = CATALOGO.find(x => x.id === id);  
+        return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"><div class="card-title" style="background:rgba(0,179,255,0.7)">Retomar</div></div>` : "";  
+    }).join('');  
+    document.getElementById("tAssistindo").classList.toggle("hidden", idsAssistindo.length === 0);  
+}  
+  
+// ================= DETALHES =================  
+function abrirDetalhes(id) {  
+    filmeAtual = CATALOGO.find(f => f.id === id);  
+    document.getElementById("homeContent").classList.add("hidden");  
+    document.getElementById("detalhesPage").classList.remove("hidden");  
+    document.getElementById("heroBg").style.backgroundImage = `url(${filmeAtual.imagem})`;  
+    document.getElementById("heroLogo").src = filmeAtual.logo;  
+    document.getElementById("detSinopse").innerText = filmeAtual.sinopse;  
+    document.getElementById("detAno").innerText = filmeAtual.ano;  
+    document.getElementById("detTemporadas").innerText = filmeAtual.temporadas;  
+    document.getElementById("detRating").innerText = filmeAtual.classificacao;  
+  
+    document.getElementById("btnPlayTop").onclick = () => playEp(filmeAtual.episodios[0].url, filmeAtual.id);  
+  
+    document.getElementById("listaEpisodios").innerHTML = filmeAtual.episodios.map((ep, i) => `  
+        <div class="episode-item" onclick="playEp('${ep.url}', '${filmeAtual.id}')">  
+            <span>EP${(i+1).toString().padStart(2, "0")} - ${ep.titulo}</span>  
+            <strong>▶</strong>  
+        </div>`).join('');  
+    updateFavButton();  
+    window.scrollTo(0, 0);  
+}  
+  
+// ================= PLAYER COM MEMÓRIA =================  
+function playEp(url, id) {  
+    const video = document.getElementById("videoPlayer");  
+    const playerPage = document.getElementById("playerPage");  
+    
+    video.src = url;  
+    playerPage.classList.remove("hidden");  
+  
+    // Verificar se tem progresso salvo  
+    const todosProgressos = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
+    const tempoSalvo = todosProgressos[id];  
+  
+    if(tempoSalvo && tempoSalvo > 5) {  
+        const retomar = confirm("Deseja continuar de onde parou?");  
+        if(retomar) video.currentTime = tempoSalvo;  
+    }  
+  
+    // Iniciar salvamento automático  
+    saveInterval = setInterval(() => {  
+        if(!video.paused) {  
+            const p = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
+            p[id] = video.currentTime;  
+            localStorage.setItem(`progresso_${userAtivo}`, JSON.stringify(p));  
+        }  
+    }, 5000);  
+}  
+  
+function fecharPlayer() {  
+    const video = document.getElementById("videoPlayer");  
+    clearInterval(saveInterval);  
+    video.pause();  
+    video.src = "";  
+    document.getElementById("playerPage").classList.add("hidden");  
+    renderHome();  
+}  
+  
+function voltarHome() {  
+    document.getElementById("homeContent").classList.remove("hidden");  
+    document.getElementById("detalhesPage").classList.add("hidden");  
+    renderHome();  
+}  
+  
+function toggleFav() {  
+    let users = JSON.parse(localStorage.getItem("fg_users"));  
+    let favs = users[userAtivo].favoritos || [];  
+    if(favs.includes(filmeAtual.id)) favs = favs.filter(id => id !== filmeAtual.id);  
+    else favs.push(filmeAtual.id);  
+    users[userAtivo].favoritos = favs;  
+    localStorage.setItem("fg_users", JSON.stringify(users));  
+    updateFavButton();  
+}  
+  
+function updateFavButton() {  
+    const users = JSON.parse(localStorage.getItem("fg_users"));  
+    const favs = users[userAtivo].favoritos || [];  
+    document.getElementById("btnFav").innerText = favs.includes(filmeAtual.id) ? "✓ Na Minha Lista" : "+ Minha Lista";  
+}  
+  
+function filtrar() {  
+    const termo = document.getElementById("inputBusca").value.toLowerCase();  
+    const section = document.getElementById("sectionBusca");  
+    if(termo.length > 0) {  
+        section.classList.remove("hidden");  
+        const filtrados = CATALOGO.filter(f => f.titulo.toLowerCase().includes(termo));  
+        document.getElementById("resBusca").innerHTML = filtrados.map(f => `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`).join('');  
+    } else section.classList.add("hidden");  
+}  
+  
+function fecharModal() { document.getElementById("createModal").classList.add("hidden"); }  
+function logout() { localStorage.removeItem("fg_sessao"); location.reload(); }  
+function deletarUser(n) { if(confirm("Apagar perfil?")) { let u = JSON.parse(localStorage.getItem("fg_users")); delete u[n]; localStorage.setItem("fg_users", JSON.stringify(u)); renderPerfis(); } }  
+  
+const fileInput = document.getElementById("newFile");  
+if(fileInput) { fileInput.addEventListener("change", function() { if(!this.files[0]) return; const reader = new FileReader(); reader.onload = e => fotoBase64 = e.target.result; reader.readAsDataURL(this.files[0]); }); }  
+  
+window.onload = () => {  
+    const sessao = localStorage.getItem("fg_sessao");  
+    if(sessao) logar(sessao); else renderPerfis();  
+};  
+</script>  
+</body>  
 </html>
