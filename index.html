@@ -53,7 +53,7 @@
   
         /* PLAYER */  
         .playerPage { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; align-items: center; justify-content: center; }  
-        .playerPage video { width: 100%; height: 100%; outline: none; }  
+        .playerPage video, .playerPage iframe { width: 100%; height: 100%; border: none; outline: none; }  
         .close-player { position: absolute; top: 25px; left: 25px; background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; z-index: 9001; }  
   
         /* MODAL */  
@@ -124,6 +124,7 @@
                 <p class="description" id="detSinopse"></p>  
                 <div style="display:flex; gap:15px; margin-bottom: 30px;">  
                     <button id="btnPlayTop" class="btn-main" style="padding: 15px 40px; font-size: 1.1rem;">▶ ASSISTIR</button>  
+                    <button id="btnTrailer" class="btn-main" style="background: rgba(255,255,255,0.1);">TRAILER</button>  
                     <button id="btnFav" class="btn-main" style="background: rgba(255,255,255,0.1);" onclick="toggleFav()">+ Minha Lista</button>  
                 </div>  
                 <button onclick="voltarHome()" style="background:none; color:var(--primary); font-weight:bold;">← VOLTAR</button>  
@@ -135,7 +136,8 @@
   
 <div id="playerPage" class="playerPage hidden">  
     <button class="close-player" onclick="fecharPlayer()">✕ Fechar</button>  
-    <video id="videoPlayer" controls autoplay></video>  
+    <video id="videoPlayer" controls autoplay class="hidden"></video>  
+    <iframe id="iframePlayer" allow="autoplay; fullscreen" class="hidden"></iframe>  
 </div>  
   
 <script>  
@@ -146,6 +148,7 @@ const CATALOGO = [
         ano: "1941 - 1943",  
         temporadas: "Temporada 1",  
         classificacao: "L",  
+        trailer: "https://www.youtube.com/embed/SaGseDvQ2RI",  
         sinopse: "O Homem De Aço Luta Contra Um Cientista Louco Que Está Destruindo Metrópolis Com Um Canhão De Energia.",  
         imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",  
         logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/8cdd465434c9026dd4fa822869a03e7d51cbe455/1771363446414_image_repair_1771850698575.png?raw=true",  
@@ -160,13 +163,11 @@ let filmeAtual = null;
 let fotoBase64 = "";  
 let saveInterval = null;  
   
-// ================= PERFIS =================  
 function renderPerfis() {  
     const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
     const container = document.getElementById("listaPerfis");  
     if(!container) return;  
     container.innerHTML = "";  
-  
     Object.keys(users).forEach(nome => {  
         container.innerHTML += `  
             <div class="profile-item" onclick="logar('${nome}')">  
@@ -175,7 +176,6 @@ function renderPerfis() {
                 <p style="color:white;margin-top:10px">${nome}</p>  
             </div>`;  
     });  
-  
     container.innerHTML += `  
         <div class="profile-item" onclick="document.getElementById('createModal').classList.remove('hidden')">  
             <div class="profile-avatar" style="display:flex;justify-content:center;align-items:center;font-size:3rem;color:#444;border:2px dashed #333">+</div>  
@@ -187,7 +187,6 @@ function salvarPerfil() {
     const nome = document.getElementById("newName").value.trim();  
     if(!nome) return alert("Digite um nome!");  
     let users = JSON.parse(localStorage.getItem("fg_users")) || {};  
-    if(users[nome]) return alert("Esse perfil já existe!");  
     users[nome] = { foto: fotoBase64 || "", favoritos: [], assistindo: [] };  
     localStorage.setItem("fg_users", JSON.stringify(users));  
     fecharModal(); renderPerfis();  
@@ -203,39 +202,30 @@ function logar(nome) {
     renderHome();  
 }  
   
-// ================= HOME =================  
 function renderHome() {  
     const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
     const dados = users[userAtivo];  
     if(!dados) return;  
-  
     document.getElementById("catalogo").innerHTML = CATALOGO.map(f => `  
         <div class="card" onclick="abrirDetalhes('${f.id}')">  
             <img src="${f.imagem}">  
             <div class="card-title">${f.titulo}</div>  
         </div>`).join('');  
-  
     const favs = dados.favoritos || [];  
-    const listaFav = document.getElementById("listaFavoritos");  
-    listaFav.innerHTML = favs.map(id => {  
+    document.getElementById("listaFavoritos").innerHTML = favs.map(id => {  
         const f = CATALOGO.find(x => x.id === id);  
         return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>` : "";  
     }).join('');  
     document.getElementById("tLista").classList.toggle("hidden", favs.length === 0);  
-  
-    // Histórico de progresso (Continuar Assistindo)  
     const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-    const listaHist = document.getElementById("listaAssistindo");  
     const idsAssistindo = Object.keys(progresso);  
-    
-    listaHist.innerHTML = idsAssistindo.reverse().map(id => {  
+    document.getElementById("listaAssistindo").innerHTML = idsAssistindo.reverse().map(id => {  
         const f = CATALOGO.find(x => x.id === id);  
         return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"><div class="card-title" style="background:rgba(0,179,255,0.7)">Retomar</div></div>` : "";  
     }).join('');  
     document.getElementById("tAssistindo").classList.toggle("hidden", idsAssistindo.length === 0);  
 }  
   
-// ================= DETALHES =================  
 function abrirDetalhes(id) {  
     filmeAtual = CATALOGO.find(f => f.id === id);  
     document.getElementById("homeContent").classList.add("hidden");  
@@ -247,10 +237,11 @@ function abrirDetalhes(id) {
     document.getElementById("detTemporadas").innerText = filmeAtual.temporadas;  
     document.getElementById("detRating").innerText = filmeAtual.classificacao;  
   
-    document.getElementById("btnPlayTop").onclick = () => playEp(filmeAtual.episodios[0].url, filmeAtual.id);  
+    document.getElementById("btnPlayTop").onclick = () => playMedia(filmeAtual.episodios[0].url, filmeAtual.id, false);  
+    document.getElementById("btnTrailer").onclick = () => playMedia(filmeAtual.trailer, null, true);  
   
     document.getElementById("listaEpisodios").innerHTML = filmeAtual.episodios.map((ep, i) => `  
-        <div class="episode-item" onclick="playEp('${ep.url}', '${filmeAtual.id}')">  
+        <div class="episode-item" onclick="playMedia('${ep.url}', '${filmeAtual.id}', false)">  
             <span>EP${(i+1).toString().padStart(2, "0")} - ${ep.titulo}</span>  
             <strong>▶</strong>  
         </div>`).join('');  
@@ -258,38 +249,42 @@ function abrirDetalhes(id) {
     window.scrollTo(0, 0);  
 }  
   
-// ================= PLAYER COM MEMÓRIA =================  
-function playEp(url, id) {  
+function playMedia(url, id, isTrailer) {  
     const video = document.getElementById("videoPlayer");  
-    const playerPage = document.getElementById("playerPage");  
-    
-    video.src = url;  
-    playerPage.classList.remove("hidden");  
+    const iframe = document.getElementById("iframePlayer");  
+    document.getElementById("playerPage").classList.remove("hidden");  
   
-    // Verificar se tem progresso salvo  
-    const todosProgressos = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-    const tempoSalvo = todosProgressos[id];  
+    if (url.includes("youtube.com") || isTrailer) {  
+        iframe.src = url;  
+        iframe.classList.remove("hidden");  
+        video.classList.add("hidden");  
+    } else {  
+        video.src = url;  
+        video.classList.remove("hidden");  
+        iframe.classList.add("hidden");  
   
-    if(tempoSalvo && tempoSalvo > 5) {  
-        const retomar = confirm("Deseja continuar de onde parou?");  
-        if(retomar) video.currentTime = tempoSalvo;  
-    }  
-  
-    // Iniciar salvamento automático  
-    saveInterval = setInterval(() => {  
-        if(!video.paused) {  
-            const p = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-            p[id] = video.currentTime;  
-            localStorage.setItem(`progresso_${userAtivo}`, JSON.stringify(p));  
+        const todosProgressos = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
+        const tempoSalvo = todosProgressos[id];  
+        if(tempoSalvo && tempoSalvo > 5) {  
+            if(confirm("Deseja continuar de onde parou?")) video.currentTime = tempoSalvo;  
         }  
-    }, 5000);  
+        saveInterval = setInterval(() => {  
+            if(!video.paused) {  
+                const p = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
+                p[id] = video.currentTime;  
+                localStorage.setItem(`progresso_${userAtivo}`, JSON.stringify(p));  
+            }  
+        }, 5000);  
+    }  
 }  
   
 function fecharPlayer() {  
     const video = document.getElementById("videoPlayer");  
+    const iframe = document.getElementById("iframePlayer");  
     clearInterval(saveInterval);  
     video.pause();  
     video.src = "";  
+    iframe.src = "";  
     document.getElementById("playerPage").classList.add("hidden");  
     renderHome();  
 }  
