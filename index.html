@@ -3,80 +3,116 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>FG PLAY</title>  
+    <title>FG PLAY | Streaming Premium</title>  
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
     <style>  
         :root {  
             --primary: #00b3ff;  
-            --bg: #0b0b0b;  
-            --card-bg: #141414;  
+            --bg: linear-gradient(135deg, #050505 0%, #000a1a 100%);  
+            --card-bg: #111;  
             --text: #fff;  
             --accent: #00FA9A;  
+            --glow: 0 0 15px rgba(0, 179, 255, 0.4);
         }  
-        body.light { --bg: #f2f2f2; --text: #111; --card-bg: #fff; }  
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }  
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; transition: .3s; }  
+        
+        body.light { --bg: #f2f2f2; --text: #111; --card-bg: #fff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }  
+        body { background: var(--bg); background-attachment: fixed; color: var(--text); overflow-x: hidden; min-height: 100vh; transition: .3s; }  
         .hidden { display: none !important; }  
-        button { cursor: pointer; border: none; transition: .3s; outline: none; }  
-  
-        /* PERFIS */  
+        
+        /* HEADER GLASS */
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px 5%; background: rgba(0,0,0,0.85); 
+            position: fixed; top: 0; width: 100%; z-index: 1000; 
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.05);
+        }  
+        .logo { color: var(--primary); font-weight: 900; font-size: 1.8rem; cursor: pointer; text-shadow: var(--glow); }  
+        .search-box input { 
+            padding: 10px 20px; border-radius: 20px; border: 1px solid #333; 
+            background: rgba(255,255,255,0.05); color: white; width: 250px; transition: .3s;
+        }
+        .search-box input:focus { width: 320px; border-color: var(--primary); outline: none; }
+
+        /* CARDS COM GLOW E ZOOM */
+        .section { padding: 110px 5% 0; }  
+        .movies { display: flex; gap: 20px; overflow-x: auto; padding: 20px 0; scrollbar-width: none; scroll-behavior: smooth;}  
+        .card { 
+            min-width: 200px; height: 300px; border-radius: 15px; 
+            overflow: hidden; position: relative; cursor: pointer; 
+            background: var(--card-bg); transition: transform .4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }  
+        .card:hover { transform: scale(1.08); box-shadow: var(--glow); z-index: 10; }  
+        .card img { width: 100%; height: 100%; object-fit: cover; }  
+        .card-title { position: absolute; bottom: 0; width: 100%; padding: 10px; background: linear-gradient(transparent, #000); color: #fff; font-size: .85rem; text-align: center; }
+
+        /* HERO BANNER */
+        .hero { min-height: 85vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; padding: 0 5%; }  
+        .hero::before { 
+            content: ''; position: absolute; inset: 0; 
+            background: linear-gradient(to top, #050505 15%, transparent 95%), 
+                        linear-gradient(to right, #050505 25%, transparent); 
+            z-index: 1; 
+        }  
+        .hero-content { position: relative; z-index: 2; max-width: 750px; }  
+        #heroLogo { max-width: 350px; margin-bottom: 25px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); }  
+        .meta { color: var(--accent); font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; display: flex; gap: 15px; }
+
+        /* PLAYER ESTILO CINEMA */
+        .playerPage { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; flex-direction: column; }  
+        .player-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .close-player { position: absolute; top: 25px; left: 25px; background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; z-index: 9001; }  
+        
+        /* BARRA DE TEMPO RESTANTE */
+        .time-remaining { 
+            position: absolute; bottom: 80px; right: 40px; 
+            background: rgba(0,0,0,0.85); padding: 10px 18px; 
+            border-radius: 12px; color: var(--accent); font-weight: bold; font-size: 0.9rem;
+            border-left: 4px solid var(--primary); pointer-events: none; backdrop-filter: blur(5px);
+        }
+
+        /* EPISÓDIOS DESIGN DISNEY+ */
+        .episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; padding: 40px 5%; }
+        .ep-card { background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden; cursor: pointer; transition: .3s; border: 1px solid #222; }
+        .ep-card:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); transform: translateY(-5px); }
+        .ep-thumb { width: 100%; aspect-ratio: 16/9; position: relative; }
+        .ep-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .ep-info { padding: 15px; }
+        .ep-title { font-weight: bold; font-size: 1rem; color: var(--primary); }
+        .ep-desc { font-size: 0.85rem; color: #999; margin: 8px 0; line-height: 1.4; }
+
+        .btn-main { background: var(--primary); color: white; padding: 15px 40px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .btn-main:hover { filter: brightness(1.2); box-shadow: var(--glow); }
+
+        /* PERFIL (Mantendo funções do código 1) */
         .profile-selector { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; position: fixed; inset: 0; z-index: 5000; }  
         .profiles-list { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }  
-        .profile-item { text-align: center; width: 140px; cursor: pointer; position: relative; }  
-        .profile-avatar { width: 130px; height: 130px; border-radius: 12px; object-fit: cover; background: #222; border: 3px solid transparent; }  
+        .profile-item { text-align: center; width: 150px; cursor: pointer; position: relative; }  
+        .profile-avatar { width: 150px; height: 150px; border-radius: 15px; object-fit: cover; background: #222; border: 4px solid transparent; transition: .3s; }  
         .profile-item:hover .profile-avatar { border-color: var(--primary); transform: scale(1.05); }  
-        .delete-btn { position: absolute; top: -10px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 25px; height: 25px; font-size: 12px; z-index: 10; }  
-  
-        /* HEADER */  
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: rgba(0,0,0,.95); position: fixed; top: 0; width: 100%; z-index: 1000; backdrop-filter: blur(10px); }  
-        .logo { color: var(--primary); font-weight: 900; font-size: 1.6rem; cursor: pointer; }  
-        .search-box input { padding: 10px 20px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: white; width: 250px; }  
-  
-        /* HOME */  
-        .section { padding: 100px 5% 0; }  
-        .movies { display: flex; gap: 15px; overflow-x: auto; padding: 20px 0; scroll-behavior: smooth; }  
-        .card { min-width: 180px; height: 260px; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer; background: var(--card-bg); transition: .3s; box-shadow: 0 4px 15px rgba(0,0,0,.5); }  
-        .card:hover { transform: scale(1.08); z-index: 100; }  
-        .card img { width: 100%; height: 100%; object-fit: cover; }  
-        .card-title { position: absolute; bottom: 0; width: 100%; padding: 10px; background: linear-gradient(transparent, #000); color: #fff; font-size: .85rem; text-align: center; }  
-  
-        /* DETALHES */  
-        .hero { min-height: 80vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; padding: 0 5%; }  
-        .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 15%, transparent 95%), linear-gradient(to right, var(--bg) 25%, transparent); z-index: 1; }  
-        .hero-content { position: relative; z-index: 2; max-width: 700px; padding-top: 60px; }  
-        #heroLogo { max-width: 320px; margin-bottom: 20px; display: block; }  
-        .meta { display: flex; gap: 15px; margin-bottom: 15px; font-weight: bold; font-size: 0.9rem; color: var(--accent); }  
-        .description { font-size: 1.1rem; line-height: 1.6; color: #ccc; margin-bottom: 25px; }  
-  
-        /* EPISÓDIOS */  
-        .episode-item { background: #1a1a1a; padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; cursor: pointer; border: 1px solid #333; }  
-        .episode-item:hover { background: #252525; border-color: var(--primary); }  
-  
-        /* PLAYER */  
-        .playerPage { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; align-items: center; justify-content: center; }  
-        .playerPage video, .playerPage iframe { width: 100%; height: 100%; border: none; outline: none; }  
-        .close-player { position: absolute; top: 25px; left: 25px; background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; z-index: 9001; }  
-  
-        /* MODAL */  
+        .delete-btn { position: absolute; top: -10px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; z-index: 10; border: none; }
+
+        /* MODAL */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,.9); display: flex; justify-content: center; align-items: center; z-index: 6000; }  
-        .modal-box { background: #181818; padding: 30px; border-radius: 15px; width: 340px; text-align: center; }  
-        .modal-box input { width: 100%; padding: 12px; margin: 12px 0; border-radius: 8px; border: none; background: #222; color: white; }  
-        .btn-main { background: var(--primary); color: white; padding: 12px 25px; border-radius: 6px; font-weight: bold; }  
+        .modal-box { background: #181818; padding: 30px; border-radius: 15px; width: 340px; text-align: center; border: 1px solid #333; }  
+        .modal-box input { width: 100%; padding: 12px; margin: 12px 0; border-radius: 8px; border: none; background: #222; color: white; }
     </style>  
 </head>  
 <body>  
-  
+
 <div id="profilePage" class="profile-selector">  
     <h1 style="color:white;margin-bottom:40px; font-size: 2.5rem;">Quem Está Assistindo?</h1>  
     <div class="profiles-list" id="listaPerfis"></div>  
 </div>  
-  
+
 <div id="createModal" class="modal hidden">  
     <div class="modal-box">  
         <h2 style="color:white; margin-bottom: 10px;">Novo Perfil</h2>  
         <input type="text" id="newName" placeholder="Nome do perfil">  
         <input type="file" id="newFile" accept="image/*">  
         <button class="btn-main" onclick="salvarPerfil()" style="width:100%">CRIAR</button>  
-        <button onclick="fecharModal()" style="background:none;color:gray;margin-top:15px; display: block; width: 100%;">Cancelar</button>  
+        <button onclick="fecharModal()" style="background:none;color:gray;margin-top:15px; display: block; width: 100%; cursor:pointer;">Cancelar</button>  
     </div>  
 </div>  
   
@@ -88,7 +124,7 @@
         </div>  
         <div style="display:flex;align-items:center;gap:15px;">  
             <button onclick="document.body.classList.toggle('light')" style="background:none;font-size:1.4rem;">🌓</button>  
-            <img id="userImg" style="width:40px;height:40px;border-radius:10px;border:2px solid var(--primary);cursor:pointer" onclick="logout()">  
+            <img id="userImg" style="width:45px;height:45px;border-radius:10px;border:2px solid var(--primary);cursor:pointer" onclick="logout()">  
         </div>  
     </header>  
   
@@ -109,7 +145,7 @@
         </section>  
   
         <section class="section" style="padding-top: 20px;">  
-            <h2>Séries em Destaque</h2>  
+            <h2>Destaques</h2>  
             <div class="movies" id="catalogo"></div>  
         </section>  
     </main>  
@@ -119,41 +155,62 @@
             <div class="hero-content">  
                 <img id="heroLogo" src="">  
                 <div class="meta">  
-                    <span id="detAno"></span> • <span id="detTemporadas"></span> • <span id="detRating"></span>  
+                    <span id="detAno"></span> • <span id="detRating"></span> • <span id="detTipo"></span>  
                 </div>  
                 <p class="description" id="detSinopse"></p>  
                 <div style="display:flex; gap:15px; margin-bottom: 30px;">  
-                    <button id="btnPlayTop" class="btn-main" style="padding: 15px 40px; font-size: 1.1rem;">▶ ASSISTIR</button>  
-                    <button id="btnTrailer" class="btn-main" style="background: rgba(255,255,255,0.1);">TRAILER</button>  
+                    <button id="btnPlayTop" class="btn-main">▶ ASSISTIR</button>  
+                    <button id="btnTrailer" class="btn-main" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);">TRAILER</button>  
                     <button id="btnFav" class="btn-main" style="background: rgba(255,255,255,0.1);" onclick="toggleFav()">+ Minha Lista</button>  
                 </div>  
-                <button onclick="voltarHome()" style="background:none; color:var(--primary); font-weight:bold;">← VOLTAR</button>  
+                <button onclick="voltarHome()" style="background:none; color:var(--primary); font-weight:bold; cursor:pointer">← VOLTAR AO INÍCIO</button>  
             </div>  
         </section>  
-        <div style="padding:40px 5%;" id="listaEpisodios"></div>  
+        <div id="areaEpisodios" class="episodes-grid"></div>  
     </div>  
 </div>  
   
 <div id="playerPage" class="playerPage hidden">  
-    <button class="close-player" onclick="fecharPlayer()">✕ Fechar</button>  
-    <video id="videoPlayer" controls autoplay class="hidden"></video>  
-    <iframe id="iframePlayer" allow="autoplay; fullscreen" class="hidden"></iframe>  
+    <button class="close-player" onclick="fecharPlayer()">✕ Fechar Player</button>  
+    <div class="player-container">
+        <video id="videoPlayer" controls autoplay></video>
+        <iframe id="iframePlayer" allow="autoplay; fullscreen" class="hidden"></iframe>
+        <div id="timerRestante" class="time-remaining hidden">Falta 00:00</div>
+    </div>
 </div>  
   
 <script>  
 const CATALOGO = [  
     {  
+        id: "asviagensdegulliver",  
+        titulo: "As Viagens De Gulliver",  
+        tipo: "filme",  
+        ano: "1939",  
+        classificacao: "L",  
+        trailer: "https://www.youtube.com/embed/rgAH3aw5Da8",  
+        sinopse: "Gulliver chega a Lilliput para tentar impedir uma guerra com o reino rival de Blefiscu e também ajudar o romance dos filhos dos governantes.",  
+        imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/ed4ae87160e5f89351a23a3bac21330ee7364b6a/IMG_20260225_223253.jpg?raw=true",  
+        logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/ed4ae87160e5f89351a23a3bac21330ee7364b6a/file_00000000ddb8720ebf838f660e6bd4ea.png?raw=true",  
+        url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/Video-1%20(1).MP4"  
+    },  
+    {  
         id: "superman",  
         titulo: "Superman (1941)",  
+        tipo: "serie",  
         ano: "1941 - 1943",  
-        temporadas: "Temporada 1",  
         classificacao: "L",  
         trailer: "https://www.youtube.com/embed/SaGseDvQ2RI",  
         sinopse: "O Homem De Aço Luta Contra Um Cientista Louco Que Está Destruindo Metrópolis Com Um Canhão De Energia.",  
         imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",  
         logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/8cdd465434c9026dd4fa822869a03e7d51cbe455/1771363446414_image_repair_1771850698575.png?raw=true",  
         episodios: [  
-            { titulo: "O Cientista Louco", url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/Video-1%20(1).MP4" }  
+            {   
+                titulo: "O Cientista Louco",   
+                desc: "Um cientista louco ameaça a cidade com um feixe de energia e Clark Kent precisa agir.",
+                thumb: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",
+                url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/Video-1%20(1).MP4",
+                duracao: "10min"
+            }  
         ]  
     }  
 ];  
@@ -161,8 +218,29 @@ const CATALOGO = [
 let userAtivo = null;  
 let filmeAtual = null;  
 let fotoBase64 = "";  
-let saveInterval = null;  
-  
+let mediaAtualID = null;
+
+// ELEMENTOS DO PLAYER
+const video = document.getElementById("videoPlayer");
+const timerDisplay = document.getElementById("timerRestante");
+
+// FUNÇÃO DE TEMPO RESTANTE E SALVAMENTO AUTOMÁTICO
+video.addEventListener("timeupdate", () => {
+    if (!video.duration || !mediaAtualID) return;
+    
+    timerDisplay.classList.remove("hidden");
+    const remaining = video.duration - video.currentTime;
+    const minutes = Math.floor(remaining / 60);
+    const seconds = Math.floor(remaining % 60);
+    timerDisplay.innerText = `⏳ Falta ${minutes}:${seconds < 10 ? "0" : ""}${seconds} para acabar`;
+
+    // Salva progresso no perfil ativo
+    const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};
+    progresso[mediaAtualID] = video.currentTime;
+    localStorage.setItem(`progresso_${userAtivo}`, JSON.stringify(progresso));
+});
+
+// GESTÃO DE PERFIS (MANTIDA DO CÓDIGO 1)
 function renderPerfis() {  
     const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
     const container = document.getElementById("listaPerfis");  
@@ -172,8 +250,8 @@ function renderPerfis() {
         container.innerHTML += `  
             <div class="profile-item" onclick="logar('${nome}')">  
                 <button class="delete-btn" onclick="event.stopPropagation();deletarUser('${nome}')">✕</button>  
-                <img src="${users[nome].foto || 'https://via.placeholder.com/130'}" class="profile-avatar">  
-                <p style="color:white;margin-top:10px">${nome}</p>  
+                <img src="${users[nome].foto || 'https://api.dicebear.com/7.x/avataaars/svg?seed='+nome}" class="profile-avatar">  
+                <p style="color:white;margin-top:10px; font-weight:bold">${nome}</p>  
             </div>`;  
     });  
     container.innerHTML += `  
@@ -187,7 +265,7 @@ function salvarPerfil() {
     const nome = document.getElementById("newName").value.trim();  
     if(!nome) return alert("Digite um nome!");  
     let users = JSON.parse(localStorage.getItem("fg_users")) || {};  
-    users[nome] = { foto: fotoBase64 || "", favoritos: [], assistindo: [] };  
+    users[nome] = { foto: fotoBase64 || "", favoritos: [] };  
     localStorage.setItem("fg_users", JSON.stringify(users));  
     fecharModal(); renderPerfis();  
 }  
@@ -198,30 +276,43 @@ function logar(nome) {
     document.getElementById("profilePage").classList.add("hidden");  
     document.getElementById("site").classList.remove("hidden");  
     const users = JSON.parse(localStorage.getItem("fg_users"));  
-    document.getElementById("userImg").src = users[nome].foto || "https://via.placeholder.com/40";  
+    document.getElementById("userImg").src = users[nome].foto || "https://api.dicebear.com/7.x/avataaars/svg?seed="+nome;  
     renderHome();  
 }  
-  
+
+// RENDERIZAÇÃO DA HOME (UNIFICADA)
 function renderHome() {  
     const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
     const dados = users[userAtivo];  
     if(!dados) return;  
+
+    // Destaques Gerais
     document.getElementById("catalogo").innerHTML = CATALOGO.map(f => `  
         <div class="card" onclick="abrirDetalhes('${f.id}')">  
             <img src="${f.imagem}">  
             <div class="card-title">${f.titulo}</div>  
         </div>`).join('');  
+
+    // Minha Lista (Favoritos)
     const favs = dados.favoritos || [];  
     document.getElementById("listaFavoritos").innerHTML = favs.map(id => {  
         const f = CATALOGO.find(x => x.id === id);  
         return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>` : "";  
     }).join('');  
     document.getElementById("tLista").classList.toggle("hidden", favs.length === 0);  
+
+    // Continue Assistindo (Com Barra de Progresso)
     const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-    const idsAssistindo = Object.keys(progresso);  
+    const idsAssistindo = Object.keys(progresso).filter(id => progresso[id] > 5);  
     document.getElementById("listaAssistindo").innerHTML = idsAssistindo.reverse().map(id => {  
         const f = CATALOGO.find(x => x.id === id);  
-        return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"><div class="card-title" style="background:rgba(0,179,255,0.7)">Retomar</div></div>` : "";  
+        if(!f) return "";
+        return `
+            <div class="card" onclick="abrirDetalhes('${f.id}')">
+                <img src="${f.imagem}">
+                <div class="card-title" style="background:rgba(0,179,255,0.7)">Retomar</div>
+                <div style="position:absolute; bottom:0; height:5px; background:var(--primary); width:100%; border-radius:0 0 15px 15px; opacity:0.8"></div>
+            </div>`;  
     }).join('');  
     document.getElementById("tAssistindo").classList.toggle("hidden", idsAssistindo.length === 0);  
 }  
@@ -230,27 +321,41 @@ function abrirDetalhes(id) {
     filmeAtual = CATALOGO.find(f => f.id === id);  
     document.getElementById("homeContent").classList.add("hidden");  
     document.getElementById("detalhesPage").classList.remove("hidden");  
+    
     document.getElementById("heroBg").style.backgroundImage = `url(${filmeAtual.imagem})`;  
     document.getElementById("heroLogo").src = filmeAtual.logo;  
     document.getElementById("detSinopse").innerText = filmeAtual.sinopse;  
     document.getElementById("detAno").innerText = filmeAtual.ano;  
-    document.getElementById("detTemporadas").innerText = filmeAtual.temporadas;  
     document.getElementById("detRating").innerText = filmeAtual.classificacao;  
-  
-    document.getElementById("btnPlayTop").onclick = () => playMedia(filmeAtual.episodios[0].url, filmeAtual.id, false);  
+    document.getElementById("detTipo").innerText = filmeAtual.tipo === "filme" ? "FILME" : "SÉRIE";
+
+    const areaEp = document.getElementById("areaEpisodios");
+    areaEp.innerHTML = "";
+
+    if (filmeAtual.tipo === "filme") {
+        // Para filme: Apenas botão de assistir principal
+        document.getElementById("btnPlayTop").onclick = () => playMedia(filmeAtual.url, filmeAtual.id);
+    } else {
+        // Para série: Botão de assistir principal (EP 1) + Grade de episódios
+        document.getElementById("btnPlayTop").onclick = () => playMedia(filmeAtual.episodios[0].url, filmeAtual.id);
+        areaEp.innerHTML = filmeAtual.episodios.map((ep, i) => `  
+            <div class="ep-card" onclick="playMedia('${ep.url}', '${filmeAtual.id}')">  
+                <div class="ep-thumb"><img src="${ep.thumb}"></div>
+                <div class="ep-info">
+                    <div class="ep-title">EP${(i+1).toString().padStart(2, "0")} - ${ep.titulo}</div>
+                    <div class="ep-desc">${ep.desc}</div>
+                    <div style="color:var(--accent); font-size:0.8rem">Duração: ${ep.duracao}</div>
+                </div>
+            </div>`).join('');  
+    }
+    
     document.getElementById("btnTrailer").onclick = () => playMedia(filmeAtual.trailer, null, true);  
-  
-    document.getElementById("listaEpisodios").innerHTML = filmeAtual.episodios.map((ep, i) => `  
-        <div class="episode-item" onclick="playMedia('${ep.url}', '${filmeAtual.id}', false)">  
-            <span>EP${(i+1).toString().padStart(2, "0")} - ${ep.titulo}</span>  
-            <strong>▶</strong>  
-        </div>`).join('');  
     updateFavButton();  
     window.scrollTo(0, 0);  
 }  
   
-function playMedia(url, id, isTrailer) {  
-    const video = document.getElementById("videoPlayer");  
+function playMedia(url, id, isTrailer = false) {  
+    mediaAtualID = id;
     const iframe = document.getElementById("iframePlayer");  
     document.getElementById("playerPage").classList.remove("hidden");  
   
@@ -258,33 +363,25 @@ function playMedia(url, id, isTrailer) {
         iframe.src = url;  
         iframe.classList.remove("hidden");  
         video.classList.add("hidden");  
+        timerDisplay.classList.add("hidden");
     } else {  
         video.src = url;  
         video.classList.remove("hidden");  
         iframe.classList.add("hidden");  
   
-        const todosProgressos = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-        const tempoSalvo = todosProgressos[id];  
+        // Tenta recuperar o progresso salvo
+        const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
+        const tempoSalvo = progresso[id];  
         if(tempoSalvo && tempoSalvo > 5) {  
             if(confirm("Deseja continuar de onde parou?")) video.currentTime = tempoSalvo;  
         }  
-        saveInterval = setInterval(() => {  
-            if(!video.paused) {  
-                const p = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-                p[id] = video.currentTime;  
-                localStorage.setItem(`progresso_${userAtivo}`, JSON.stringify(p));  
-            }  
-        }, 5000);  
     }  
 }  
   
 function fecharPlayer() {  
-    const video = document.getElementById("videoPlayer");  
-    const iframe = document.getElementById("iframePlayer");  
-    clearInterval(saveInterval);  
     video.pause();  
     video.src = "";  
-    iframe.src = "";  
+    document.getElementById("iframePlayer").src = "";  
     document.getElementById("playerPage").classList.add("hidden");  
     renderHome();  
 }  
