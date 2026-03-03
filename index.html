@@ -2,7 +2,7 @@
 <html lang="pt-br">  
 <head>  
     <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
     <title>FG PLAY</title>  
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
 <style>  
@@ -16,339 +16,219 @@
     }  
     
     body.light { --bg: #f2f2f2; --text: #111; --card-bg: #fff; }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }  
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }  
+
     body { background: var(--bg); background-attachment: fixed; color: var(--text); overflow-x: hidden; min-height: 100vh; transition: .3s; }  
     .hidden { display: none !important; }  
     
-    /* HEADER GLASS */
+    button, .card, .profile-item, .logo, .ep-card { cursor: pointer !important; touch-action: manipulation; }
+
+    /* HEADER */
     header { 
         display: flex; justify-content: space-between; align-items: center; 
         padding: 15px 5%; background: rgba(0,0,0,0.85); 
         position: fixed; top: 0; width: 100%; z-index: 1000; 
-        backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.05);
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
     }  
-    .logo { color: var(--primary); font-weight: 900; font-size: 1.8rem; cursor: pointer; text-shadow: var(--glow); }  
+    .logo { color: var(--primary); font-weight: 900; font-size: 1.8rem; text-shadow: var(--glow); }  
     .search-box input { 
         padding: 10px 20px; border-radius: 20px; border: 1px solid #333; 
-        background: rgba(255,255,255,0.05); color: white; width: 250px; transition: .3s;
+        background: rgba(255,255,255,0.05); color: white; width: 150px; transition: .3s;
     }
-    .search-box input:focus { width: 320px; border-color: var(--primary); outline: none; }
 
-    /* CARDS COM GLOW E ZOOM */
+    /* SEÇÕES E CARDS */
     .section { padding: 110px 5% 0; }  
-    .movies { display: flex; gap: 20px; overflow-x: auto; padding: 20px 0; scrollbar-width: none; scroll-behavior: smooth;}  
+    .movies { display: flex; gap: 20px; overflow-x: auto; padding: 20px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }  
     .card { 
-        min-width: 200px; height: 300px; border-radius: 15px; 
-        overflow: hidden; position: relative; cursor: pointer; 
-        background: var(--card-bg); transition: transform .4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        min-width: 160px; height: 240px; border-radius: 15px; 
+        overflow: hidden; position: relative; background: var(--card-bg); 
+        transition: transform .4s; box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }  
-    .card:hover { transform: scale(1.08); box-shadow: var(--glow); z-index: 10; }  
-    .card img { width: 100%; height: 100%; object-fit: cover; }  
-    .card-title { position: absolute; bottom: 0; width: 100%; padding: 10px; background: linear-gradient(transparent, #000); color: #fff; font-size: .85rem; text-align: center; }
+    .card img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }  
+    .card-title { position: absolute; bottom: 0; width: 100%; padding: 10px; background: linear-gradient(transparent, #000); font-size: .85rem; text-align: center; }
 
-    /* HERO BANNER */
-    .hero { min-height: 85vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; padding: 0 5%; }  
-    .hero::before { 
-        content: ''; position: absolute; inset: 0; 
-        background: linear-gradient(to top, #050505 15%, transparent 95%), 
-                    linear-gradient(to right, #050505 25%, transparent); 
-        z-index: 1; 
-    }  
-    .hero-content { position: relative; z-index: 2; max-width: 750px; }  
-    #heroLogo { max-width: 350px; margin-bottom: 25px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); }  
-    .meta { color: var(--accent); font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; display: flex; gap: 15px; }
-
-    /* PLAYER ESTILO CINEMA */
-    .playerPage { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; flex-direction: column; }  
-    .player-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }    
-    
-    #videoPlayer { 
-        width: 100%; 
-        height: 100%; 
-        max-height: 100vh; 
-        outline: none; 
-        background: #000;
-    }
-
-    /* Estilização dos Controles */
-    video::-webkit-media-controls-panel {
-        background-image: linear-gradient(transparent, rgba(0,0,0,1)) !important;
-    }
-
-    video::-webkit-media-controls-play-button,
-    video::-webkit-media-controls-mute-button,
-    video::-webkit-media-controls-timeline,
-    video::-webkit-media-controls-volume-slider {
-        filter: hue-rotate(180deg) saturate(3) brightness(1.2);
-    }
-
-    .close-player { 
-        position: absolute; top: 25px; left: 25px; 
-        background: rgba(0, 179, 255, 0.8); 
-        color: white; padding: 12px 25px; 
-        border-radius: 30px; font-weight: bold; 
-        z-index: 9001; border: none; cursor: pointer;
-        backdrop-filter: blur(10px);
-        transition: .3s;
-    }  
-
-    /* EPISÓDIOS DESIGN DISNEY+ */
-    .episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; padding: 40px 5%; }    
-    .ep-card { background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden; cursor: pointer; transition: .3s; border: 1px solid #222; }    
-    .ep-card:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); transform: translateY(-5px); }    
-    .ep-thumb { width: 100%; aspect-ratio: 16/9; position: relative; }    
-    .ep-thumb img { width: 100%; height: 100%; object-fit: cover; }    
-    .ep-info { padding: 15px; }    
-    .ep-title { font-weight: bold; font-size: 1rem; color: var(--primary); }    
-
-    .btn-main { background: var(--primary); color: white; padding: 15px 40px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; border: none; }    
+    /* PLAYER */
+    .playerPage { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; }  
+    #videoPlayer, #iframePlayer { width: 100%; height: 100%; background: #000; border: none; }
+    .close-player { position: absolute; top: 25px; left: 25px; background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold; z-index: 10001; border: none; }  
 
     /* PERFIL */
     .profile-selector { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; position: fixed; inset: 0; z-index: 5000; }      
-    .profiles-list { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }      
-    .profile-avatar { width: 150px; height: 150px; border-radius: 15px; object-fit: cover; background: #222; border: 4px solid transparent; transition: .3s; }      
+    .profile-avatar { width: 130px; height: 130px; border-radius: 15px; object-fit: cover; border: 4px solid transparent; transition: 0.3s; }
+    .profile-item:hover .profile-avatar { border-color: var(--primary); transform: scale(1.05); }
+
+    .btn-main { background: var(--primary); color: white; padding: 15px 30px; border-radius: 10px; font-weight: bold; border: none; }
 </style>
 </head>  
 <body>  
 
 <div id="profilePage" class="profile-selector">  
-    <h1 style="color:white;margin-bottom:40px; font-size: 2.5rem;">Quem Está Assistindo?</h1>  
-    <div class="profiles-list" id="listaPerfis"></div>  
+    <h1 style="color:white;margin-bottom:40px; font-size: 2rem; text-align: center;">Quem Está Assistindo?</h1>  
+    <div class="profiles-list" id="listaPerfis" style="display:flex; gap:25px; flex-wrap:wrap; justify-content:center;"></div>  
 </div>  
 
-<div id="createModal" class="modal hidden">  
-    <div class="modal-box">  
-        <h2 style="color:white; margin-bottom: 10px;">Novo Perfil</h2>  
-        <input type="text" id="newName" placeholder="Nome do perfil">  
-        <input type="file" id="newFile" accept="image/*">  
-        <button class="btn-main" onclick="salvarPerfil()" style="width:100%">CRIAR</button>  
-        <button onclick="fecharModal()" style="background:none;color:gray;margin-top:15px; display: block; width: 100%; cursor:pointer;">Cancelar</button>  
+<div id="createModal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:6000; display:flex; align-items:center; justify-content:center;">  
+    <div style="background:#111; padding:35px; border-radius:20px; width:90%; max-width:400px; border: 1px solid #222;">  
+        <h2 style="color:white; margin-bottom: 20px;">Novo Perfil</h2>  
+        <input type="text" id="newName" placeholder="Nome do perfil" style="width:100%; padding:15px; margin-bottom:15px; background:#1a1a1a; border:1px solid #333; color:white; border-radius:10px;">  
+        <label style="color:#888; display:block; margin-bottom:10px; font-size:0.9rem;">Foto de perfil (opcional):</label>
+        <input type="file" id="newFile" accept="image/*" style="color:white; margin-bottom:25px; width:100%;">  
+        <button class="btn-main" onclick="salvarPerfil()" style="width:100%; margin-bottom:10px;">CRIAR AGORA</button>  
+        <button onclick="fecharModal()" style="background:none; color:#ff4444; width:100%; border:none; padding:10px;">Cancelar</button>  
     </div>  
 </div>  
-  
+
 <div id="site" class="hidden">  
     <header>  
         <div class="logo" onclick="voltarHome()">FG PLAY</div>  
-        <div class="search-box">  
-            <input type="text" id="inputBusca" placeholder="O que você quer assistir?" oninput="filtrar()">  
-        </div>  
-        <div style="display:flex;align-items:center;gap:15px;">  
-            <button onclick="document.body.classList.toggle('light')" style="background:none;font-size:1.4rem;">🌓</button>  
-            <img id="userImg" style="width:45px;height:45px;border-radius:10px;border:2px solid var(--primary);cursor:pointer" onclick="logout()">  
-        </div>  
+        <div class="search-box"><input type="text" id="inputBusca" placeholder="Buscar..." oninput="filtrar()"></div>  
+        <img id="userImg" style="width:40px;height:40px;border-radius:8px; border:2px solid var(--primary); cursor:pointer;" onclick="logout()">  
     </header>  
   
     <main id="homeContent">  
-        <section id="sectionBusca" class="section hidden">  
-            <h2>Resultados da Busca</h2>  
-            <div class="movies" id="resBusca"></div>  
-        </section>  
-  
-        <section class="section">  
-            <h2 id="tAssistindo" class="hidden">Continue Assistindo</h2>  
-            <div class="movies" id="listaAssistindo"></div>  
-        </section>  
-  
-        <section class="section" style="padding-top: 20px;">  
-            <h2 id="tLista" class="hidden">Minha Lista</h2>  
-            <div class="movies" id="listaFavoritos"></div>  
-        </section>  
-  
-        <section class="section" style="padding-top: 20px;">  
-            <h2>Destaques</h2>  
-            <div class="movies" id="catalogo"></div>  
-        </section>  
+        <section id="sectionBusca" class="section hidden"><h2>Resultados</h2><div class="movies" id="resBusca"></div></section>  
+        <section class="section"><h2 id="tAssistindo" class="hidden">Continue Assistindo</h2><div class="movies" id="listaAssistindo"></div></section>  
+        <section class="section" style="padding-top: 10px;"><h2 id="tLista" class="hidden">Minha Lista</h2><div class="movies" id="listaFavoritos"></div></section>  
+        <section class="section" style="padding-top: 10px;"><h2>Destaques</h2><div class="movies" id="catalogo"></div></section>  
     </main>  
-  
-    <div id="detalhesPage" class="hidden">  
-        <section class="hero" id="heroBg">  
-            <div class="hero-content">  
-                <img id="heroLogo" src="">  
-                <div class="meta">  
-                    <span id="detAno"></span> • <span id="detRating"></span> • <span id="detTipo"></span>  
-                </div>  
-                <p class="description" id="detSinopse"></p>  
-                <div style="display:flex; gap:15px; margin-bottom: 30px;">  
-                    <button id="btnPlayTop" class="btn-main">▶ ASSISTIR</button>  
-                    <button id="btnTrailer" class="btn-main" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);">TRAILER</button>  
-                    <button id="btnFav" class="btn-main" style="background: rgba(255,255,255,0.1);" onclick="toggleFav()">+ Minha Lista</button>  
-                </div>  
-                <button onclick="voltarHome()" style="background:none; color:var(--primary); font-weight:bold; cursor:pointer">← VOLTAR AO INÍCIO</button>  
-            </div>  
-        </section>  
-        <div id="areaEpisodios" class="episodes-grid"></div>  
-    </div>  
-</div>  
-  
-<div id="playerPage" class="playerPage hidden">  
-    <button class="close-player" onclick="fecharPlayer()">✕ Fechar Player</button>  
-    <div class="player-container">
-        <video id="videoPlayer" controls autoplay></video>
-        <iframe id="iframePlayer" allow="autoplay; fullscreen" class="hidden"></iframe>
-        <div id="timerRestante" class="time-remaining hidden">Falta 00:00</div>
+
+    <div id="detalhesPage" class="hidden">
+        <div id="heroBg" style="height:60vh; background-size:cover; background-position:center; position:relative; display:flex; align-items:flex-end; padding:40px 5%;">
+            <div style="position:absolute; inset:0; background:linear-gradient(transparent, #050505);"></div>
+            <div style="position:relative; z-index:2; max-width:800px;">
+                <img id="heroLogo" src="" style="max-width:300px; margin-bottom:20px;">
+                <p id="detSinopse" style="margin-bottom:25px;"></p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button id="btnPlayTop" class="btn-main">▶ ASSISTIR</button>
+                    <button id="btnFav" class="btn-main" style="background:rgba(255,255,255,0.1);" onclick="toggleFav()">+ Minha Lista</button>
+                </div>
+                <button onclick="voltarHome()" style="background:none; color:var(--primary); border:none; margin-top:20px; display:block;">← VOLTAR</button>
+            </div>
+        </div>
+        <div id="areaEpisodios" class="episodes-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px; padding:20px 5%;"></div>
     </div>
 </div>  
-  
+
+<div id="playerPage" class="playerPage hidden">  
+    <button class="close-player" onclick="fecharPlayer()">✕ Fechar</button>  
+    <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+        <video id="videoPlayer" controls playsinline autoplay></video>
+        <iframe id="iframePlayer" allow="autoplay; fullscreen" class="hidden"></iframe>
+    </div>
+</div>  
+
 <script>  
 const CATALOGO = [  
     {  
         id: "superman",  
         titulo: "Superman (1941)",  
-        tipo: "Ação, Super-hero",  
-        ano: "1941 - 1943",  
-        classificacao: "L",  
-        trailer: "https://www.youtube.com/embed/SaGseDvQ2RI",  
-        sinopse: "O Homem De Aço Luta Contra Um Cientista Louco Que Está Destruindo Metrópolis Com Um Canhão De Energia.",  
+        tipo: "filme",  
+        ano: "1941",  
         imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",  
         logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/8cdd465434c9026dd4fa822869a03e7d51cbe455/1771363446414_image_repair_1771850698575.png?raw=true",  
-        episodios: [  
-            {   
-                titulo: "O Cientista Louco",   
-                desc: "Um cientista louco ameaça a cidade com um feixe de energia e Clark Kent precisa agir.",
-                thumb: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/d86124da092006f3e5ab4de43414957ebdda5558/IMG_20260224_092858_image_repair_1771936873528.png?raw=true",
-                url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/SUPERMAN%20EP01.MP4",
-                duracao: "10min"
-            }  
-        ]  
+        url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/SUPERMAN%20EP01.MP4",
+        sinopse: "O clássico do Homem de Aço combatendo cientistas loucos em Metrópolis."
     },
     {  
         id: "Popeye",  
         titulo: "Popeye",  
-        tipo: "Aventura, Comédia",  
-        ano: "1930 - 1960",  
-        classificacao: "L",  
-        trailer: "", // Link de exemplo
-        sinopse: "um marinheiro valente, de cachimbo e antebraços desproporcionalmente musculosos, que adquire força sobre-humana ao comer espinafre.",  
+        tipo: "serie",  
+        ano: "1930",  
         imagem: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/7207514b9aa1c7947033f491bb3e17c692c451c8/IMG_20260301_142930.jpg?raw=true",  
-        logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/7207514b9aa1c7947033f491bb3e17c692c451c8/61487af2d329bb0004dbd328.png?raw=true", // Imagem fictícia
+        logo: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/7207514b9aa1c7947033f491bb3e17c692c451c8/61487af2d329bb0004dbd328.png?raw=true",
+        sinopse: "O marinheiro valente que ganha super força com espinafre.",
         episodios: [  
-            {   
-                titulo: "Cotonetes Assustadores",   
-                desc: "Perdidos no mar, Popeye e Olívia entram em um navio fantasma e precisam enfrentar tripulantes sobrenaturais para escapar.",
-                thumb: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/38011313aca7c461aa9329ff63b161a60ff6b7dc/IMG_20260301_144645.jpg?raw=true",
-                url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/POPEYE%20EP01.mp4", // Usando o mesmo vídeo de teste
-                duracao: "6 minutos"
-            },
-            {   
-                titulo: "Um Encontro Para Patinar",   
-                desc: "Popeye tenta ensinar Olívia a patinar, mas ela perde o controle, causa uma grande confusão pela cidade e ele precisa do espinafre para salvá-la no final.",
-                thumb: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/38011313aca7c461aa9329ff63b161a60ff6b7dc/IMG_20260301_164630.jpg?raw=true",
-                url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/POPEYE%20EP02.mp4",
-                duracao: "7 minutos"
-            },
-            {   
-                titulo: "História Antiga de Fistory",   
-                desc: "Na Idade Média, Popeye trabalha para Brutus, mas com a ajuda de seu padrinho mágico — numa paródia invertida de Cinderela — ele vai ao baile da Princesa Olívia em um carro feito de lata de espinafre.",
-                thumb: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/38011313aca7c461aa9329ff63b161a60ff6b7dc/IMG_20260301_164641.jpg?raw=true",
-                url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/POPEYE%20EP03.mp4",
-                duracao: "6 minutos"
-            }
+            { titulo: "Cotonetes Assustadores", thumb: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/38011313aca7c461aa9329ff63b161a60ff6b7dc/IMG_20260301_144645.jpg?raw=true", url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/POPEYE%20EP01.mp4" },
+            { titulo: "Um Encontro Para Patinar", thumb: "https://github.com/jhykgkg76787-alt/FGPLAY/blob/38011313aca7c461aa9329ff63b161a60ff6b7dc/IMG_20260301_164630.jpg?raw=true", url: "https://xycobxioryxmsttwunrd.supabase.co/storage/v1/object/public/FG%20PLAY/POPEYE%20EP02.mp4" }
         ]  
     }
 ];
 
-  
 let userAtivo = null;  
 let filmeAtual = null;  
 let fotoBase64 = "";  
 let mediaAtualID = null;
 
-// ELEMENTOS DO PLAYER
-const video = document.getElementById("videoPlayer");
-const timerDisplay = document.getElementById("timerRestante");
-
-// FUNÇÃO DE TEMPO RESTANTE E SALVAMENTO AUTOMÁTICO
-video.addEventListener("timeupdate", () => {
-    if (!video.duration || !mediaAtualID) return;
-    
-    timerDisplay.classList.remove("hidden");
-    const remaining = video.duration - video.currentTime;
-    const minutes = Math.floor(remaining / 60);
-    const seconds = Math.floor(remaining % 60);
-    timerDisplay.innerText = `⏳ Falta ${minutes}:${seconds < 10 ? "0" : ""}${seconds} para acabar`;
-
-    // Salva progresso no perfil ativo
-    const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};
-    progresso[mediaAtualID] = video.currentTime;
-    localStorage.setItem(`progresso_${userAtivo}`, JSON.stringify(progresso));
-});
-
-// GESTÃO DE PERFIS (MANTIDA DO CÓDIGO 1)
+// GESTÃO DE PERFIS
 function renderPerfis() {  
     const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
     const container = document.getElementById("listaPerfis");  
-    if(!container) return;  
     container.innerHTML = "";  
     Object.keys(users).forEach(nome => {  
         container.innerHTML += `  
-            <div class="profile-item" onclick="logar('${nome}')">  
-                <button class="delete-btn" onclick="event.stopPropagation();deletarUser('${nome}')">✕</button>  
+            <div class="profile-item" onclick="logar('${nome}')" style="text-align:center;">  
                 <img src="${users[nome].foto || 'https://api.dicebear.com/7.x/avataaars/svg?seed='+nome}" class="profile-avatar">  
-                <p style="color:white;margin-top:10px; font-weight:bold">${nome}</p>  
+                <p style="color:white;margin-top:10px; font-weight:bold;">${nome}</p>  
+                <button onclick="event.stopPropagation();deletarPerfil('${nome}')" style="background:none; border:none; color:#ff4444; font-size:0.8rem; cursor:pointer;">Remover</button>
             </div>`;  
     });  
-    container.innerHTML += `  
-        <div class="profile-item" onclick="document.getElementById('createModal').classList.remove('hidden')">  
-            <div class="profile-avatar" style="display:flex;justify-content:center;align-items:center;font-size:3rem;color:#444;border:2px dashed #333">+</div>  
-            <p style="color:white;margin-top:10px">Novo Perfil</p>  
+    container.innerHTML += `
+        <div class="profile-item" onclick="abrirModal()" style="text-align:center;">
+            <div class="profile-avatar" style="background:#222; display:flex; align-items:center; justify-content:center; font-size:3rem; color:#444;">+</div>
+            <p style="color:white; margin-top:10px;">Novo</p>
         </div>`;  
 }  
   
 function salvarPerfil() {  
-    const nome = document.getElementById("newName").value.trim();  
+    const nomeInput = document.getElementById("newName");
+    const nome = nomeInput.value.trim();  
     if(!nome) return alert("Digite um nome!");  
+
     let users = JSON.parse(localStorage.getItem("fg_users")) || {};  
-    users[nome] = { foto: fotoBase64 || "", favoritos: [] };  
+    users[nome] = { 
+        foto: fotoBase64 || `https://api.dicebear.com/7.x/avataaars/svg?seed=${nome}`, 
+        favoritos: [] 
+    };  
+    
     localStorage.setItem("fg_users", JSON.stringify(users));  
-    fecharModal(); renderPerfis();  
+    
+    // Resetar campos
+    nomeInput.value = "";
+    fotoBase64 = "";
+    document.getElementById("newFile").value = "";
+    
+    fecharModal(); 
+    renderPerfis();  
 }  
-  
+
+function deletarPerfil(nome) {
+    if(confirm(`Excluir o perfil de ${nome}?`)) {
+        let users = JSON.parse(localStorage.getItem("fg_users"));
+        delete users[nome];
+        localStorage.setItem("fg_users", JSON.stringify(users));
+        renderPerfis();
+    }
+}
+
 function logar(nome) {  
     userAtivo = nome;  
     localStorage.setItem("fg_sessao", nome);  
     document.getElementById("profilePage").classList.add("hidden");  
     document.getElementById("site").classList.remove("hidden");  
     const users = JSON.parse(localStorage.getItem("fg_users"));  
-    document.getElementById("userImg").src = users[nome].foto || "https://api.dicebear.com/7.x/avataaars/svg?seed="+nome;  
+    document.getElementById("userImg").src = users[nome].foto;  
     renderHome();  
 }  
 
-// RENDERIZAÇÃO DA HOME (UNIFICADA)
+// SITE E NAVEGAÇÃO
 function renderHome() {  
     const users = JSON.parse(localStorage.getItem("fg_users")) || {};  
     const dados = users[userAtivo];  
     if(!dados) return;  
 
-    // Destaques Gerais
     document.getElementById("catalogo").innerHTML = CATALOGO.map(f => `  
         <div class="card" onclick="abrirDetalhes('${f.id}')">  
             <img src="${f.imagem}">  
             <div class="card-title">${f.titulo}</div>  
         </div>`).join('');  
 
-    // Minha Lista (Favoritos)
     const favs = dados.favoritos || [];  
     document.getElementById("listaFavoritos").innerHTML = favs.map(id => {  
         const f = CATALOGO.find(x => x.id === id);  
         return f ? `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>` : "";  
     }).join('');  
     document.getElementById("tLista").classList.toggle("hidden", favs.length === 0);  
-
-    // Continue Assistindo (Com Barra de Progresso)
-    const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-    const idsAssistindo = Object.keys(progresso).filter(id => progresso[id] > 5);  
-    document.getElementById("listaAssistindo").innerHTML = idsAssistindo.reverse().map(id => {  
-        const f = CATALOGO.find(x => x.id === id);  
-        if(!f) return "";
-        return `
-            <div class="card" onclick="abrirDetalhes('${f.id}')">
-                <img src="${f.imagem}">
-                <div class="card-title" style="background:rgba(0,179,255,0.7)">Retomar</div>
-                <div style="position:absolute; bottom:0; height:5px; background:var(--primary); width:100%; border-radius:0 0 15px 15px; opacity:0.8"></div>
-            </div>`;  
-    }).join('');  
-    document.getElementById("tAssistindo").classList.toggle("hidden", idsAssistindo.length === 0);  
 }  
   
 function abrirDetalhes(id) {  
@@ -359,65 +239,43 @@ function abrirDetalhes(id) {
     document.getElementById("heroBg").style.backgroundImage = `url(${filmeAtual.imagem})`;  
     document.getElementById("heroLogo").src = filmeAtual.logo;  
     document.getElementById("detSinopse").innerText = filmeAtual.sinopse;  
-    document.getElementById("detAno").innerText = filmeAtual.ano;  
-    document.getElementById("detRating").innerText = filmeAtual.classificacao;  
-    document.getElementById("detTipo").innerText = filmeAtual.tipo === "filme" ? "FILME" : "SÉRIE";
 
     const areaEp = document.getElementById("areaEpisodios");
     areaEp.innerHTML = "";
 
     if (filmeAtual.tipo === "filme") {
-        // Para filme: Apenas botão de assistir principal
         document.getElementById("btnPlayTop").onclick = () => playMedia(filmeAtual.url, filmeAtual.id);
     } else {
-        // Para série: Botão de assistir principal (EP 1) + Grade de episódios
         document.getElementById("btnPlayTop").onclick = () => playMedia(filmeAtual.episodios[0].url, filmeAtual.id);
         areaEp.innerHTML = filmeAtual.episodios.map((ep, i) => `  
-            <div class="ep-card" onclick="playMedia('${ep.url}', '${filmeAtual.id}')">  
-                <div class="ep-thumb"><img src="${ep.thumb}"></div>
-                <div class="ep-info">
-                    <div class="ep-title">EP${(i+1).toString().padStart(2, "0")} - ${ep.titulo}</div>
-                    <div class="ep-desc">${ep.desc}</div>
-                    <div style="color:var(--accent); font-size:0.8rem">Duração: ${ep.duracao}</div>
-                </div>
+            <div class="ep-card" onclick="playMedia('${ep.url}', '${filmeAtual.id}')" style="background:#111; border-radius:10px; overflow:hidden;">  
+                <img src="${ep.thumb}" style="width:100%; aspect-ratio:16/9; object-fit:cover;">
+                <div style="padding:10px; color:var(--primary); font-weight:bold;">EP${i+1} - ${ep.titulo}</div>
             </div>`).join('');  
     }
-    
-    document.getElementById("btnTrailer").onclick = () => playMedia(filmeAtual.trailer, null, true);  
-    updateFavButton();  
+    updateFavButton();
     window.scrollTo(0, 0);  
 }  
   
-function playMedia(url, id, isTrailer = false) {  
+function playMedia(url, id) {  
     mediaAtualID = id;
+    const video = document.getElementById("videoPlayer");
     const iframe = document.getElementById("iframePlayer");  
     document.getElementById("playerPage").classList.remove("hidden");  
   
-    if (url.includes("youtube.com") || isTrailer) {  
-        iframe.src = url;  
-        iframe.classList.remove("hidden");  
-        video.classList.add("hidden");  
-        timerDisplay.classList.add("hidden");
+    if (url.includes("youtube.com")) {  
+        iframe.src = url; iframe.classList.remove("hidden"); video.classList.add("hidden");  
     } else {  
-        video.src = url;  
-        video.classList.remove("hidden");  
-        iframe.classList.add("hidden");  
-  
-        // Tenta recuperar o progresso salvo
-        const progresso = JSON.parse(localStorage.getItem(`progresso_${userAtivo}`)) || {};  
-        const tempoSalvo = progresso[id];  
-        if(tempoSalvo && tempoSalvo > 5) {  
-            if(confirm("Deseja continuar de onde parou?")) video.currentTime = tempoSalvo;  
-        }  
+        video.src = url; video.classList.remove("hidden"); iframe.classList.add("hidden");  
+        video.play().catch(() => {});
     }  
 }  
   
 function fecharPlayer() {  
-    video.pause();  
-    video.src = "";  
+    const video = document.getElementById("videoPlayer");
+    video.pause(); video.src = "";  
     document.getElementById("iframePlayer").src = "";  
     document.getElementById("playerPage").classList.add("hidden");  
-    renderHome();  
 }  
   
 function voltarHome() {  
@@ -425,7 +283,7 @@ function voltarHome() {
     document.getElementById("detalhesPage").classList.add("hidden");  
     renderHome();  
 }  
-  
+
 function toggleFav() {  
     let users = JSON.parse(localStorage.getItem("fg_users"));  
     let favs = users[userAtivo].favoritos || [];  
@@ -440,8 +298,8 @@ function updateFavButton() {
     const users = JSON.parse(localStorage.getItem("fg_users"));  
     const favs = users[userAtivo].favoritos || [];  
     document.getElementById("btnFav").innerText = favs.includes(filmeAtual.id) ? "✓ Na Minha Lista" : "+ Minha Lista";  
-}  
-  
+}
+
 function filtrar() {  
     const termo = document.getElementById("inputBusca").value.toLowerCase();  
     const section = document.getElementById("sectionBusca");  
@@ -451,14 +309,19 @@ function filtrar() {
         document.getElementById("resBusca").innerHTML = filtrados.map(f => `<div class="card" onclick="abrirDetalhes('${f.id}')"><img src="${f.imagem}"></div>`).join('');  
     } else section.classList.add("hidden");  
 }  
-  
+
+function abrirModal() { document.getElementById("createModal").classList.remove("hidden"); }
 function fecharModal() { document.getElementById("createModal").classList.add("hidden"); }  
 function logout() { localStorage.removeItem("fg_sessao"); location.reload(); }  
-function deletarUser(n) { if(confirm("Apagar perfil?")) { let u = JSON.parse(localStorage.getItem("fg_users")); delete u[n]; localStorage.setItem("fg_users", JSON.stringify(u)); renderPerfis(); } }  
-  
-const fileInput = document.getElementById("newFile");  
-if(fileInput) { fileInput.addEventListener("change", function() { if(!this.files[0]) return; const reader = new FileReader(); reader.onload = e => fotoBase64 = e.target.result; reader.readAsDataURL(this.files[0]); }); }  
-  
+
+// LISTENER PARA IMAGEM
+document.getElementById("newFile").addEventListener("change", function() {
+    if(!this.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => fotoBase64 = e.target.result;
+    reader.readAsDataURL(this.files[0]);
+});
+
 window.onload = () => {  
     const sessao = localStorage.getItem("fg_sessao");  
     if(sessao) logar(sessao); else renderPerfis();  
